@@ -1,45 +1,37 @@
 package com.example.textrecoapp;
 
-import java.io.IOException;
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceHolder.Callback;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.textrecoapp.ar.CameraPreview;
+import com.example.textrecoapp.ar.ScanningResult;
 import com.example.textrecoapp.ar.TrainSetHandler;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-public class MainActivity extends Activity implements Callback {
-
-  // paths
-  public static final String PHOTO_PATH = Environment.getExternalStorageDirectory().toString()
-      + "images/dummy_photo.jpg";
+public class MainActivity extends Activity implements ScanningResult {
 
   // settings
-  public static final String PHOTO_TAKEN = "photo taken";
+  public static final String PHOTO_TAKEN = "photo_taken";
   public static final String LOG_TAG = "MainActivity";
 
   private Camera camera;
 
   // ui
-  private SurfaceView surfaceView;
-  private View scanArea;
+  private FrameLayout surfaceViewContainer;
   private Button scanBtn;
-  private ImageView scanResult;
+  private View progressBar;
 
   // OCR
   private TessBaseAPI ocrAPI;
@@ -69,17 +61,17 @@ public class MainActivity extends Activity implements Callback {
   }
 
   private void initUI() {
-    surfaceView = (SurfaceView) findViewById(R.id.surface_view);
+    camera = Camera.open();
+    CameraPreview preview = new CameraPreview(this, camera);
+    surfaceViewContainer = (FrameLayout) findViewById(R.id.surface_view_container);
+    surfaceViewContainer.addView(preview);
 
-    SurfaceHolder holder = surfaceView.getHolder();
-    holder.addCallback(this);
-
-    scanArea = findViewById(R.id.scan_area);
     scanBtn = (Button) findViewById(R.id.scan_btn);
-    scanResult = (ImageView) findViewById(R.id.result_img);
+    progressBar = findViewById(R.id.progress_overlay);
 
     final int scanAreaWidth = getResources().getDimensionPixelOffset(R.dimen.scan_area_width);
     final int scanAreaHeight = getResources().getDimensionPixelOffset(R.dimen.scan_area_height);
+
     scanBtn.setOnClickListener(new OnClickListener() {
 
       @Override
@@ -88,62 +80,84 @@ public class MainActivity extends Activity implements Callback {
 
           @Override
           public void onPictureTaken(byte[] data, Camera camera) {
-            Bitmap source = BitmapFactory.decodeByteArray(data, 0, data.length);
-
-            float wfact = source.getWidth() / (float) surfaceView.getWidth();
-            float hfact = source.getHeight() / (float) surfaceView.getHeight();
-
-            int picScanWidth = (int) (wfact * scanAreaWidth);
-            int picScanHeight = (int) (hfact * scanAreaHeight);
-
-            int x = source.getWidth() / 2 - picScanWidth / 2;
-            int y = source.getHeight() / 2 - picScanHeight / 2;
-
-            Bitmap bmp = Bitmap.createBitmap(source, x, y, picScanWidth, picScanHeight);
-            source.recycle();
-
-            scanResult.setImageBitmap(bmp);
-
-            ocrAPI.setImage(bmp);
-            String recongizedtext = ocrAPI.getUTF8Text();
-            Toast.makeText(MainActivity.this, recongizedtext, Toast.LENGTH_SHORT).show();
+            Bitmap bmp = prepareBitmapFromCamera(data, scanAreaWidth, scanAreaHeight);
+            prepareScanningDialog(bmp);
           }
         });
-
       }
     });
   }
 
-  @Override
-  public void surfaceCreated(SurfaceHolder holder) {
-    try {
-      camera.setPreviewDisplay(holder);
-      camera.startPreview();
-    } catch (IOException e) {
-      Log.e(LOG_TAG, "Error when starting the app");
-    }
+  private void prepareScanningDialog(final Bitmap bmp) {
+    ImageView imgView = new ImageView(this);
+    imgView.setImageBitmap(bmp);
+
+    String title = "Scanned area";
+    String posBtnText = "Scan image";
+    String negBtnText = "Retry";
+
+    DialogInterface.OnClickListener posListener = new DialogInterface.OnClickListener() {
+
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        ImageOcrProcessing task = new ImageOcrProcessing(progressBar, ocrAPI, MainActivity.this);
+        task.execute(bmp);
+      }
+    };
+
+    DialogInterface.OnClickListener negListener = new DialogInterface.OnClickListener() {
+
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        camera.startPreview();
+      }
+    };
+
+    AlertDialog dialog =
+        UiUtils.createDialogWithImageView(this, title, posBtnText, negBtnText, imgView, posListener, negListener);
+    dialog.show();
   }
 
-  @Override
-  public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-  }
+  private Bitmap prepareBitmapFromCamera(byte[] data, int scanAreaWidth, int scanAreaHeight) {
+    Bitmap source = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-  @Override
-  public void surfaceDestroyed(SurfaceHolder holder) {
-    // camera.stopPreview();
+    float wfact = source.getWidth() / (float) surfaceViewContainer.getWidth();
+    float hfact = source.getHeight() / (float) surfaceViewContainer.getHeight();
+
+    int picScanWidth = (int) (wfact * scanAreaWidth);
+    int picScanHeight = (int) (hfact * scanAreaHeight);
+
+    int x = source.getWidth() / 2 - picScanWidth / 2;
+    int y = source.getHeight() / 2 - picScanHeight / 2;
+
+    Bitmap bmp = Bitmap.createBitmap(source, x, y, picScanWidth, picScanHeight);
+    source.recycle();
+    return bmp;
   }
 
   @Override
   protected void onPause() {
     super.onPause();
-    camera.stopPreview();
-    camera.release();
+
+    if (camera != null) {
+      camera.release();
+      camera = null;
+    }
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    camera = Camera.open();
+
+    if (camera == null) {
+      camera = Camera.open();
+    }
+  }
+
+  @Override
+  public void onScanningFinished(String resultString) {
+    Toast.makeText(this, resultString, Toast.LENGTH_SHORT).show();
+    camera.startPreview();
   }
 
 }
