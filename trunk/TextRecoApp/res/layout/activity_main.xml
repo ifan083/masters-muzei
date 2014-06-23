@@ -2,21 +2,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <SurfaceView
-        android:id="@+id/surface_view"
+    <FrameLayout
+        android:id="@+id/surface_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
-
-        <ImageView
-            android:id="@+id/result_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" />
 
         <Button
             android:id="@+id/scan_btn"
@@ -33,5 +26,12 @@
             android:layout_centerInParent="true"
             android:background="@drawable/scan_area_background" />
     </RelativeLayout>
+
+    <include
+        android:id="@+id/progress_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/progress"
+        android:visibility="gone" />
 
 </FrameLayout>

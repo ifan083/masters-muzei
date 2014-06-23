@@ -13,7 +13,7 @@ import android.util.Log;
 
 public class TrainSetHandler {
 
-  public static final String LOG_TAG = "MainActivity";
+  public static final String LOG_TAG = "TrainSetHandler";
   public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString()
       + "/TextRecoApp";
 
@@ -47,7 +47,7 @@ public class TrainSetHandler {
       try {
         AssetManager assetsManager = context.getAssets();
         InputStream is = assetsManager.open(lang + ".traineddata");
-        OutputStream os = new FileOutputStream(DATA_PATH + "/tessdata/" + lang + "traineddata");
+        OutputStream os = new FileOutputStream(DATA_PATH + "/tessdata/" + lang + ".traineddata");
 
         byte[] buffer = new byte[1024];
         int lenght;
@@ -58,7 +58,7 @@ public class TrainSetHandler {
 
         is.close();
         os.close();
-
+        
         Log.v(LOG_TAG, "Copied " + lang + ".traineddata");
       } catch (Exception e) {
         Log.e(LOG_TAG, "Was unable to copy " + lang + ".traineddata");
