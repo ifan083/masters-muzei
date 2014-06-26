@@ -34,9 +34,9 @@ public final class UiUtils {
     return builder.create();
   }
 
-  public static StateListDrawable getStateDrawableForId(Context context, String id) {
-    String str_id_regular = RES_PREFIX + id;
-    String str_id_pressed = RES_PREFIX + id + RES_HIGHLIGHTED;
+  public static StateListDrawable getStateDrawableForId(Context context, String id, boolean hasPrefix) {
+    String str_id_regular = (hasPrefix ? RES_PREFIX : "") + id;
+    String str_id_pressed = (hasPrefix ? RES_PREFIX : "") + id + RES_HIGHLIGHTED;
     int id_normal = context.getResources().getIdentifier(str_id_regular, RES_TYPE_DRAWABLE, context.getPackageName());
     int id_pressed = context.getResources().getIdentifier(str_id_pressed, RES_TYPE_DRAWABLE, context.getPackageName());
 

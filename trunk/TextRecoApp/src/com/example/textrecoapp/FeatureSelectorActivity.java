@@ -8,6 +8,7 @@ package com.example.textrecoapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,7 +36,14 @@ public class FeatureSelectorActivity extends Activity {
 
     @Override
     public void onClick(View v) {
-      Toast.makeText(FeatureSelectorActivity.this, String.valueOf(v.getTag()), Toast.LENGTH_SHORT).show();
+
+      if (v.getTag().equals("Muzei")) {
+        Intent intent = new Intent(FeatureSelectorActivity.this, CharacterSelectorActivity.class);
+        startActivity(intent);
+      } else {
+        Toast.makeText(FeatureSelectorActivity.this, String.valueOf(v.getTag()), Toast.LENGTH_SHORT).show();
+      }
+
     }
   };
 
@@ -52,25 +60,24 @@ public class FeatureSelectorActivity extends Activity {
 
     ImageView achievements = new ImageView(this);
     achievements.setTag("Achievements");
-    achievements.setImageDrawable(UiUtils.getStateDrawableForId(this, "achievements"));
+    achievements.setImageDrawable(UiUtils.getStateDrawableForId(this, "achievements", true));
     achievements.setLayoutParams(params);
     achievements.setOnClickListener(characterListener);
     characterContainer.addView(achievements);
 
     ImageView muzei = new ImageView(this);
     muzei.setTag("Muzei");
-    muzei.setImageDrawable(UiUtils.getStateDrawableForId(this, "middle"));
+    muzei.setImageDrawable(UiUtils.getStateDrawableForId(this, "middle", true));
     muzei.setLayoutParams(params);
     muzei.setOnClickListener(characterListener);
     characterContainer.addView(muzei);
 
     ImageView statue = new ImageView(this);
     statue.setTag("Statue");
-    statue.setImageDrawable(UiUtils.getStateDrawableForId(this, "statue"));
+    statue.setImageDrawable(UiUtils.getStateDrawableForId(this, "statue", true));
     statue.setLayoutParams(params);
     statue.setOnClickListener(characterListener);
     characterContainer.addView(statue);
   }
-
 
 }
