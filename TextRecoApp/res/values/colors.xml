@@ -1,5 +1,6 @@
 <resources>
 
     <color name="progress_background">#A8CCCCCC</color>
+    <color name="panel_background">#A8202020</color>
 
 </resources>
