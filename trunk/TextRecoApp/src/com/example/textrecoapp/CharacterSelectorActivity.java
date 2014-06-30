@@ -19,6 +19,10 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.example.textrecoapp.characters.Character;
+import com.example.textrecoapp.gameplay.CartographerMapHandler;
+import com.example.textrecoapp.gameplay.CharacterMissionHandler;
+
 public class CharacterSelectorActivity extends Activity {
 
   private ViewGroup leftPanel;
@@ -33,6 +37,9 @@ public class CharacterSelectorActivity extends Activity {
   // panel contents
   private TextView leftTitle;
   private TextView leftContent;
+
+  private CharacterMissionHandler missionHandler;
+  private CartographerMapHandler mapHandler;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +57,6 @@ public class CharacterSelectorActivity extends Activity {
     characterContainer = (LinearLayout) findViewById(R.id.character_container);
 
     leftPanel = (ViewGroup) findViewById(R.id.left_info_panel);
-    View leftPanelContent = getLayoutInflater().inflate(R.layout.left_panel_layout, leftPanel);
-    leftTitle = (TextView) leftPanelContent.findViewById(R.id.title);
-    leftContent = (TextView) leftPanelContent.findViewById(R.id.content);
-
     rightPanel = (ViewGroup) findViewById(R.id.right_info_panel);
 
     // values
@@ -87,15 +90,27 @@ public class CharacterSelectorActivity extends Activity {
 
       // animate
       v.animate().translationXBy(screenCenterX - left);
-      
 
       fadeInView(leftPanel);
       fadeInView(rightPanel);
-      
+
       populateLeftPanel(v);
       populateRightPanel(v);
+
+      if (v.getTag().equals("")) {
+
+      } else {
+        String characterNameId = String.valueOf(v.getTag());
+        Character character = findCharacterByName(characterNameId);
+        missionHandler.handleMissionForCharacter(character, leftPanel, rightPanel);
+      }
     }
+
   };
+
+  private Character findCharacterByName(String characterNameId) {
+    return null;
+  }
 
   private void populateRightPanel(View view) {
     // TODO Auto-generated method stub
@@ -105,15 +120,11 @@ public class CharacterSelectorActivity extends Activity {
   private void populateLeftPanel(View view) {
     String title = String.valueOf(view.getTag());
     String content =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        + " Ut fringilla erat ac vulputate porta. "
-        + "Donec vel purus in ipsum vulputate lobortis ut at leo."
-        + " Integer sodales quis nibh ut dapibus."
-        + " Aenean euismod est scelerisque, ultricies metus quis, accumsan eros. "
-        + "Curabitur egestas egestas placerat."
-        + " Aenean pulvinar, libero vel suscipit facilisis, "
-        + "leo ipsum volutpat risus, "
-        + "sit amet malesuada neque mauris vitae magna.;";
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit." + " Ut fringilla erat ac vulputate porta. "
+            + "Donec vel purus in ipsum vulputate lobortis ut at leo." + " Integer sodales quis nibh ut dapibus."
+            + " Aenean euismod est scelerisque, ultricies metus quis, accumsan eros. "
+            + "Curabitur egestas egestas placerat." + " Aenean pulvinar, libero vel suscipit facilisis, "
+            + "leo ipsum volutpat risus, " + "sit amet malesuada neque mauris vitae magna.;";
     leftTitle.setText(title);
     leftContent.setText(content);
   }
@@ -131,7 +142,7 @@ public class CharacterSelectorActivity extends Activity {
 
     ImageView ancientWarior = new ImageView(this);
     ancientWarior.setLayoutParams(params);
-    ancientWarior.setTag("Ancient warior");
+    ancientWarior.setTag("Ancient warrior");
     ancientWarior.setImageDrawable(UiUtils.getStateDrawableForId(this, "falanga_man", false));
     ancientWarior.setOnClickListener(characterClickListener);
     characterContainer.addView(ancientWarior);
