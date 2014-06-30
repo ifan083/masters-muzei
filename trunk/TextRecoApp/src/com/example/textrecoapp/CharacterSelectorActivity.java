@@ -17,9 +17,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.TextView;
 
 import com.example.textrecoapp.characters.Character;
+import com.example.textrecoapp.data.CharacterGenerator;
 import com.example.textrecoapp.gameplay.CartographerMapHandler;
 import com.example.textrecoapp.gameplay.CharacterMissionHandler;
 
@@ -34,10 +34,6 @@ public class CharacterSelectorActivity extends Activity {
   private View selectedView;
   private int selectedViewLeft;
 
-  // panel contents
-  private TextView leftTitle;
-  private TextView leftContent;
-
   private CharacterMissionHandler missionHandler;
   private CartographerMapHandler mapHandler;
 
@@ -48,6 +44,11 @@ public class CharacterSelectorActivity extends Activity {
 
     initUI();
     loadCharacters();
+    loadHandlers();
+  }
+
+  private void loadHandlers() {
+    missionHandler = new CharacterMissionHandler(this);
   }
 
   private void initUI() {
@@ -94,9 +95,6 @@ public class CharacterSelectorActivity extends Activity {
       fadeInView(leftPanel);
       fadeInView(rightPanel);
 
-      populateLeftPanel(v);
-      populateRightPanel(v);
-
       if (v.getTag().equals("")) {
 
       } else {
@@ -109,24 +107,14 @@ public class CharacterSelectorActivity extends Activity {
   };
 
   private Character findCharacterByName(String characterNameId) {
-    return null;
-  }
-
-  private void populateRightPanel(View view) {
-    // TODO Auto-generated method stub
-
-  }
-
-  private void populateLeftPanel(View view) {
-    String title = String.valueOf(view.getTag());
-    String content =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit." + " Ut fringilla erat ac vulputate porta. "
-            + "Donec vel purus in ipsum vulputate lobortis ut at leo." + " Integer sodales quis nibh ut dapibus."
-            + " Aenean euismod est scelerisque, ultricies metus quis, accumsan eros. "
-            + "Curabitur egestas egestas placerat." + " Aenean pulvinar, libero vel suscipit facilisis, "
-            + "leo ipsum volutpat risus, " + "sit amet malesuada neque mauris vitae magna.;";
-    leftTitle.setText(title);
-    leftContent.setText(content);
+    Character character = null;
+    for (Character c : CharacterGenerator.getInstance().getCharacters()) {
+      if (characterNameId.equals(c.getName())) {
+        character = c;
+        break;
+      }
+    }
+    return character;
   }
 
   private void loadCharacters() {
@@ -140,26 +128,14 @@ public class CharacterSelectorActivity extends Activity {
     cartographer.setOnClickListener(characterClickListener);
     characterContainer.addView(cartographer);
 
-    ImageView ancientWarior = new ImageView(this);
-    ancientWarior.setLayoutParams(params);
-    ancientWarior.setTag("Ancient warrior");
-    ancientWarior.setImageDrawable(UiUtils.getStateDrawableForId(this, "falanga_man", false));
-    ancientWarior.setOnClickListener(characterClickListener);
-    characterContainer.addView(ancientWarior);
-
-    ImageView komita = new ImageView(this);
-    komita.setLayoutParams(params);
-    komita.setTag("Komita");
-    komita.setImageDrawable(UiUtils.getStateDrawableForId(this, "komita", false));
-    komita.setOnClickListener(characterClickListener);
-    characterContainer.addView(komita);
-
-    ImageView partizan = new ImageView(this);
-    partizan.setLayoutParams(params);
-    partizan.setTag("Partizan");
-    partizan.setImageDrawable(UiUtils.getStateDrawableForId(this, "partizan", false));
-    partizan.setOnClickListener(characterClickListener);
-    characterContainer.addView(partizan);
+    for (Character character : CharacterGenerator.getInstance().getCharacters()) {
+      ImageView iv = new ImageView(this);
+      iv.setLayoutParams(params);
+      iv.setTag(character.getName());
+      iv.setImageDrawable(UiUtils.getStateDrawableForId(this, character.getPictureFilename(), false));
+      iv.setOnClickListener(characterClickListener);
+      characterContainer.addView(iv);
+    }
   }
 
   private void goBackToNormal() {

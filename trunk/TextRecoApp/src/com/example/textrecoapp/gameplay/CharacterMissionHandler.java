@@ -128,7 +128,7 @@ public class CharacterMissionHandler {
   }
 
   private void inflateRightPanel(ViewGroup rightPanel) {
-    View rightPanelContent = layoutInflater.inflate(R.layout.left_panel_layout, rightPanel);
+    View rightPanelContent = layoutInflater.inflate(R.layout.right_panel_layout, rightPanel);
     missionTitle = (TextView) rightPanelContent.findViewById(R.id.mission_title);
     missionProgress = (TextView) rightPanelContent.findViewById(R.id.mission_progress);
     missionDescription = (TextView) rightPanelContent.findViewById(R.id.mission_description);
