@@ -6,47 +6,70 @@
  */
 package com.example.textrecoapp.characters;
 
+import java.io.Serializable;
+
+import com.example.textrecoapp.gameplay.MissionContext;
+
 /**
  * AKA Category.
  */
-public class Character {
+public class Character implements Serializable {
 
+  public static final boolean STATE_IN_PROGRESS = true;
+  public static final boolean STATE_IDLE = false;
+  
+  public static final int KNOWLEDGE_BASIC = 1;
+  public static final int KNOWLEDGE_INTERMEDIATE = 2;
+  public static final int KNOWLEDGE_SUPERIOR = 3;
+  public static final int KNOWLEDGE_EXPERT = 4;
+
+  private MissionContext mission;
   private String name;
-  private String categoryName;
+  private String category;
   private String pictureFilename;
-  private int totalMissions;
-  private int currentMission;
+  private int latestUnlockedLevel;
+  private boolean state;
 
-  public Character(String name, String categoryName, String pictureFilename, int totalMissions, int currentMission) {
+  public Character(String name, String category, String pictureFilename) {
+
     this.name = name;
-    this.categoryName = categoryName;
+    this.category = category;
     this.pictureFilename = pictureFilename;
-    this.totalMissions = totalMissions;
-    this.currentMission = currentMission;
+
+    state = STATE_IDLE;
+    latestUnlockedLevel = 1;
   }
 
   public String getName() {
     return name;
   }
 
-  public String getCategoryName() {
-    return categoryName;
+  public String getCategory() {
+    return category;
   }
 
   public String getPictureFilename() {
     return pictureFilename;
   }
 
-  public int getTotalMissions() {
-    return totalMissions;
+  public boolean getState() {
+    return state;
   }
 
-  public int getCurrentMission() {
-    return currentMission;
+  public void changeState(boolean state) {
+    this.state = state;
   }
 
-  public void updateMissionStatus() {
-    currentMission++;
+  public int getLatestUnlockedLevel() {
+    return latestUnlockedLevel;
+  }
+
+  public MissionContext getMission() {
+    return mission;
+  }
+
+  public void setMission(MissionContext mission) {
+    this.mission = mission;
   }
 
 }

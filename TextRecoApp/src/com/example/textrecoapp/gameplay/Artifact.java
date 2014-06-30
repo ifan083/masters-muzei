@@ -12,11 +12,19 @@ public class Artifact {
   private String description;
   private String pictureFilename;
   private float[] coordinatePercentages;
-  private int difficulty;
+  private int difficulty; // rank
+  private String category;
+  private boolean unlockedArtifact;
 
-  public Artifact(String name, String description, String pictureFilename, float[] coordinatePercentages, int difficulty) {
+  public Artifact(String name,
+      String description,
+      String category,
+      String pictureFilename,
+      float[] coordinatePercentages,
+      int difficulty) {
     this.name = name;
     this.description = description;
+    this.category = category;
     this.pictureFilename = pictureFilename;
     this.coordinatePercentages = coordinatePercentages;
     this.difficulty = difficulty;
@@ -40,6 +48,18 @@ public class Artifact {
 
   public String getDescription() {
     return description;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void unlockArtefact() {
+    unlockedArtifact = true;
+  }
+
+  public boolean isArtefactUnlocked() {
+    return unlockedArtifact;
   }
 
 }

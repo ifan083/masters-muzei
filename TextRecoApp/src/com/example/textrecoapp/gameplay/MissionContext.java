@@ -14,13 +14,15 @@ public class MissionContext {
   public static final int STAGE_PASSED = 1;
   public static final int MISSION_COMPLETE = 2;
 
+  private int difficulty;
   private String title;
   private List<MissionStage> stages;
   private int current;
 
-  public MissionContext(String title, List<MissionStage> stages) {
+  public MissionContext(String title, int difficulty, List<MissionStage> stages) {
     this.title = title;
     this.stages = stages;
+    this.difficulty = difficulty;
     current = 0;
   }
 
@@ -30,6 +32,10 @@ public class MissionContext {
 
   public List<MissionStage> getStages() {
     return stages;
+  }
+
+  public int getDifficulty() {
+    return difficulty;
   }
 
   public int tryAnswer(String newTry) {
@@ -46,5 +52,9 @@ public class MissionContext {
       return STAGE_PASSED;
     }
 
+  }
+
+  public String getMissionProgress() {
+    return current + " / " + stages.size();
   }
 }

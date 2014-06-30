@@ -1,4 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/panel_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
@@ -8,23 +9,36 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/character_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textColor="@android:color/white"
+            android:layout_margin="5dp"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/content"
+            android:id="@+id/character_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:textColor="@android:color/white"
+            android:layout_margin="15dp"
             android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/start_newgame_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/start_new_mission" />
+
+        <LinearLayout
+            android:id="@+id/difficulty_conatainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+        </LinearLayout>
     </LinearLayout>
 
 </ScrollView>
