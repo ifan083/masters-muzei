@@ -17,6 +17,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
+        android:name="com.example.textrecoapp.App"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -30,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.textrecoapp.MainActivity"
+            android:name="com.example.textrecoapp.OCRActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>

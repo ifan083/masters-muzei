@@ -4,10 +4,10 @@
     <string name="app_name">TextRecoApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="scan_btn">Scan</string>
 
     <!-- Missions -->
     <string name="mission_description_template">Gain %1$s knowledge in %2$s history.</string>
-    <!-- String text = String.format(getResources().getString(R.string.welcome_messages), username, mailCount); -->
     <string name="knowledge_basic">basic</string>
     <string name="knowledge_intermediate">intermediate</string>
     <string name="knowledge_superior">superior</string>
@@ -17,8 +17,9 @@
     <string name="mission_progress">Mission progress: </string>
     <string name="find_artifact">Find artifact</string>
     <string name="start_new_mission">Start new mission</string>
-    <string name="character_description_template">Hi! I am %1$s enthusiast and I will be your recruiter today.</string>
-
+    <string name="character_description_template">Hi! I am an admirer of \"%1$s\" historical period and I will be your recruiter today.</string>
     <string name="no_mission_in_progress">No mission in progress</string>
-    <string name="how_to_start_mission">Select a difficulty and click on "Start new mission"</string>
+    <string name="how_to_start_mission">Select a difficulty and click on \'Start new mission\'</string>
+    <string name="next_hint">Next Hint</string>
+
 </resources>

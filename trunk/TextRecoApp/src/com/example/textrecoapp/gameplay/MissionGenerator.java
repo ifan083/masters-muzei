@@ -6,11 +6,20 @@
  */
 package com.example.textrecoapp.gameplay;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import android.content.Context;
+
+import com.example.textrecoapp.data.ArtifactsGenerator;
+
 public final class MissionGenerator {
 
-  private MissionGenerator instance;
+  private static MissionGenerator instance;
+  private Random randomGenerator;
 
-  public MissionGenerator getInstance() {
+  public static MissionGenerator getInstance() {
     if (instance == null) {
       instance = new MissionGenerator();
     }
@@ -22,7 +31,7 @@ public final class MissionGenerator {
   }
 
   private void init() {
-
+    randomGenerator = new Random();
   }
 
   /**
@@ -32,7 +41,27 @@ public final class MissionGenerator {
    * @param difficulty
    * @return newly generated mission based on the input variables
    */
-  public MissionContext generateMissionForCharacter(String category, int difficulty) {
-    return null;
+  public MissionContext generateMissionForCharacter(Context context, String category, int difficulty) {
+    // always get 3 artifacts for each mission
+    List<Artifact> artifactsForMission = new ArrayList<Artifact>();
+    for (Artifact a : ArtifactsGenerator.getInstance().getAllArtifacts()) {
+      if (a.getCategory().equals(category) && a.getDifficulty() == difficulty) {
+        artifactsForMission.add(a);
+      }
+    }
+
+    List<MissionStage> missionStages = new ArrayList<MissionStage>();
+    
+    for (int i = 0; i < 3; i++) {
+      Artifact artifact = artifactsForMission.get(randomGenerator.nextInt(artifactsForMission.size()));
+      artifactsForMission.remove(artifact);
+      
+      MissionStage stage = new MissionStage(artifact);
+      missionStages.add(stage);
+    }
+    
+    String missionTitle = category + " " + GameplayUtils.getDifficultyDescriptor(context, difficulty);
+    MissionContext missionContext = new MissionContext(missionTitle, difficulty, missionStages);
+    return missionContext;
   }
 }

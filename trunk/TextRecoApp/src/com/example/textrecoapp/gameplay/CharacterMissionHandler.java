@@ -7,6 +7,7 @@
 package com.example.textrecoapp.gameplay;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.textrecoapp.CharacterSelectorActivity;
+import com.example.textrecoapp.OCRActivity;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.data.ArtifactsGenerator;
@@ -36,6 +39,7 @@ public class CharacterMissionHandler {
   private Button startNewMissionBtn;
   private TextView missionTitle;
   private TextView missionDescription;
+  private View missionProgressContainer;
   private TextView missionProgress;
   private Button findArtifactBtn;
 
@@ -62,26 +66,27 @@ public class CharacterMissionHandler {
     String charDescription = String.format(templateString, character.getCategory());
     characterDescription.setText(charDescription);
 
-    populateDifficultyLevels(character.getCategory(), character.getLatestUnlockedLevel());
+    // FIXME: currently, the name of the character is the category (should be fixed for each
+    // artifact in ArtifactsGenerator)
+    populateDifficultyLevels(character.getName(), character.getLatestUnlockedLevel());
 
     // check idle vs. current mission behavior
     if (character.getState() == Character.STATE_IDLE) {
       missionTitle.setText(context.getResources().getString(R.string.no_mission_in_progress));
-      missionDescription.setText(context.getResources().getString(R.string.how_to_start_mission));
+      missionDescription.setText("\"" + context.getResources().getString(R.string.how_to_start_mission) + "\"");
       findArtifactBtn.setVisibility(View.GONE);
+      missionProgressContainer.setVisibility(View.GONE);
     } else {
       int missionDificulty = character.getMission().getDifficulty();
-      String difficultyDescription = getDifficultyDescriptor(missionDificulty);
-      missionTitle.setText(character.getCategory() + " " + difficultyDescription);
-      String templateString2 = context.getResources().getString(R.string.mission_description_template);
-      String formattedString = String.format(templateString2, difficultyDescription, character.getCategory());
-      missionDescription.setText(formattedString);
+      missionTitle.setText(character.getMission().getTitle());
+      missionDescription.setText(formatMissionDescription(missionDificulty));
 
       highlightCurrentMissionDifficulty(missionDificulty);
 
       // mission progress
       missionProgress.setText(character.getMission().getMissionProgress());
       findArtifactBtn.setVisibility(View.VISIBLE);
+      missionProgressContainer.setVisibility(View.VISIBLE);
     }
 
     startNewMissionBtn.setOnClickListener(startNewMissionListener);
@@ -93,25 +98,57 @@ public class CharacterMissionHandler {
     @Override
     public void onClick(View v) {
       if (character.getState() == Character.STATE_IDLE) {
-        Toast.makeText(context, "generate new mission", Toast.LENGTH_SHORT).show();
+        // generate mission
+        // TODO: store the selected difficulty level
+        // FIXME: currently, the name of the character is the category (should be fixed for each
+        // artifact in ArtifactsGenerator)
+        // TODO: extract the code below in a runnable object that will be passed as a result in the
+        // dialog passed in the else brackets
+        MissionContext mission =
+            MissionGenerator.getInstance().generateMissionForCharacter(context, character.getName(), 1);
+        character.setMission(mission);
+        // update right panel
+        updateRightPanelWithMission();
       } else {
         Toast.makeText(context, "show dialog if user wants to stop current mission", Toast.LENGTH_SHORT).show();
       }
-      Toast.makeText(context, "start new mission", Toast.LENGTH_SHORT).show();
     }
   };
+
+  private void updateRightPanelWithMission() {
+    int missionDificulty = character.getMission().getDifficulty();
+
+    missionTitle.setText(character.getMission().getTitle());
+    missionDescription.setText(formatMissionDescription(missionDificulty));
+    missionProgress.setText(character.getMission().getMissionProgress());
+    missionProgressContainer.setVisibility(View.VISIBLE);
+    findArtifactBtn.setVisibility(View.VISIBLE);
+    highlightCurrentMissionDifficulty(missionDificulty);
+  }
+
+  private String formatMissionDescription(int difficulty) {
+    String difficultyDescription = GameplayUtils.getDifficultyDescriptor(context, difficulty);
+    String templateString2 = context.getResources().getString(R.string.mission_description_template);
+    String formattedString = String.format(templateString2, difficultyDescription, character.getCategory());
+    return formattedString;
+  }
 
   private View.OnClickListener findArtefactListener = new OnClickListener() {
 
     @Override
     public void onClick(View v) {
-      Toast.makeText(context, "redirect to OCR screen", Toast.LENGTH_SHORT).show();
+      CharacterSelectorActivity activity = (CharacterSelectorActivity) context;
+
+      Intent intent = new Intent(context, OCRActivity.class);
+      intent.putExtra(OCRActivity.EXTRAS_CHARACTER, character);
+      activity.startActivityForResult(intent, CharacterSelectorActivity.REQ_CODE_OCR);
     }
   };
 
   private void highlightCurrentMissionDifficulty(int missionDificulty) {
     for (int i = 0; i < difficultyContainer.getChildCount(); i++) {
-      TextView tv = (TextView) difficultyContainer.getChildAt(i);
+      ViewGroup v = (ViewGroup) difficultyContainer.getChildAt(i);
+      TextView tv = (TextView) v.getChildAt(0);
       if (Integer.parseInt(String.valueOf(tv.getText())) == missionDificulty) {
         tv.setBackgroundResource(currentDifficultyColor);
         break;
@@ -120,25 +157,34 @@ public class CharacterMissionHandler {
   }
 
   private void inflateLeftPanel(ViewGroup leftPanel) {
-    View leftPanelContent = layoutInflater.inflate(R.layout.left_panel_layout, leftPanel);
-    characterTitle = (TextView) leftPanelContent.findViewById(R.id.character_title);
-    characterDescription = (TextView) leftPanelContent.findViewById(R.id.character_description);
-    difficultyContainer = (LinearLayout) leftPanelContent.findViewById(R.id.difficulty_conatainer);
-    startNewMissionBtn = (Button) leftPanelContent.findViewById(R.id.start_newgame_btn);
+    if (characterTitle == null) {
+      View leftPanelContent = layoutInflater.inflate(R.layout.left_panel_layout, leftPanel);
+      characterTitle = (TextView) leftPanelContent.findViewById(R.id.character_title);
+      characterDescription = (TextView) leftPanelContent.findViewById(R.id.character_description);
+      difficultyContainer = (LinearLayout) leftPanelContent.findViewById(R.id.difficulty_conatainer);
+      startNewMissionBtn = (Button) leftPanelContent.findViewById(R.id.start_newgame_btn);
+    }
   }
 
   private void inflateRightPanel(ViewGroup rightPanel) {
-    View rightPanelContent = layoutInflater.inflate(R.layout.right_panel_layout, rightPanel);
-    missionTitle = (TextView) rightPanelContent.findViewById(R.id.mission_title);
-    missionProgress = (TextView) rightPanelContent.findViewById(R.id.mission_progress);
-    missionDescription = (TextView) rightPanelContent.findViewById(R.id.mission_description);
-    findArtifactBtn = (Button) rightPanelContent.findViewById(R.id.find_artifact_btn);
+    if (missionTitle == null) {
+      View rightPanelContent = layoutInflater.inflate(R.layout.right_panel_layout, rightPanel);
+      missionTitle = (TextView) rightPanelContent.findViewById(R.id.mission_title);
+      missionProgress = (TextView) rightPanelContent.findViewById(R.id.mission_progress);
+      missionProgressContainer = rightPanelContent.findViewById(R.id.mission_progress_container);
+      missionDescription = (TextView) rightPanelContent.findViewById(R.id.mission_description);
+      findArtifactBtn = (Button) rightPanelContent.findViewById(R.id.find_artifact_btn);
+    }
   }
 
   private void populateDifficultyLevels(String category, int latestUnlocked) {
+
+    difficultyContainer.removeAllViews();
+
     int totalLvls = ArtifactsGenerator.getInstance().getTotalLevelsForCategory(category);
     for (int i = 1; i <= totalLvls; i++) {
-      TextView tv = (TextView) layoutInflater.inflate(R.layout.difficulty_level, null);
+      View diffLayout = layoutInflater.inflate(R.layout.difficulty_level, null);
+      TextView tv = (TextView) diffLayout.findViewById(R.id.diff_tv);
       tv.setText(String.valueOf(i));
       if (i <= latestUnlocked) {
         tv.setBackgroundResource(unlockedDifficultyColor);
@@ -146,8 +192,8 @@ public class CharacterMissionHandler {
         tv.setBackgroundResource(lockedDifficultyColor);
         tv.setEnabled(false);
       }
-      difficultyContainer.addView(tv);
       tv.setOnClickListener(difficultyListener);
+      difficultyContainer.addView(diffLayout);
     }
   }
 
@@ -160,21 +206,8 @@ public class CharacterMissionHandler {
     }
   };
 
-  public String getDifficultyDescriptor(int level) {
-    switch (level) {
-      case Character.KNOWLEDGE_BASIC:
-        return context.getResources().getString(R.string.knowledge_basic);
-
-      case Character.KNOWLEDGE_INTERMEDIATE:
-        return context.getResources().getString(R.string.knowledge_intermediate);
-
-      case Character.KNOWLEDGE_SUPERIOR:
-        return context.getResources().getString(R.string.knowledge_superior);
-
-      case Character.KNOWLEDGE_EXPERT:
-        return context.getResources().getString(R.string.knowledge_expert);
-    }
-
-    return "";
+  public void handleResultFromOCR(String result) {
+    Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
   }
+
 }

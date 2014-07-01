@@ -9,6 +9,7 @@ package com.example.textrecoapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.Toast;
 
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.data.CharacterGenerator;
@@ -25,6 +27,8 @@ import com.example.textrecoapp.gameplay.CharacterMissionHandler;
 
 public class CharacterSelectorActivity extends Activity {
 
+  public static final int REQ_CODE_OCR = 3606;
+  
   private ViewGroup leftPanel;
   private ViewGroup rightPanel;
   private View characterBackground;
@@ -95,8 +99,8 @@ public class CharacterSelectorActivity extends Activity {
       fadeInView(leftPanel);
       fadeInView(rightPanel);
 
-      if (v.getTag().equals("")) {
-
+      if (v.getTag().equals("Cartographer")) {
+        Toast.makeText(CharacterSelectorActivity.this, "Cartographer was clicked", Toast.LENGTH_SHORT).show();
       } else {
         String characterNameId = String.valueOf(v.getTag());
         Character character = findCharacterByName(characterNameId);
@@ -177,6 +181,12 @@ public class CharacterSelectorActivity extends Activity {
     } else {
       goBackToNormal();
     }
+  }
+  
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    missionHandler.handleResultFromOCR("Result");
   }
 
 }

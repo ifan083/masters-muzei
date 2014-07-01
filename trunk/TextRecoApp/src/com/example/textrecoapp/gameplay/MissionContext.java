@@ -6,9 +6,10 @@
  */
 package com.example.textrecoapp.gameplay;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MissionContext {
+public class MissionContext implements Serializable {
 
   public static final int STAGE_FAILED = 0;
   public static final int STAGE_PASSED = 1;
@@ -55,6 +56,10 @@ public class MissionContext {
   }
 
   public String getMissionProgress() {
-    return current + " / " + stages.size();
+    return current + "/" + stages.size();
+  }
+  
+  public String getHint() {
+    return stages.get(current).getHint();
   }
 }

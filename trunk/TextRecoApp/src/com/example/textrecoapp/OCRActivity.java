@@ -13,18 +13,20 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.textrecoapp.ar.CameraPreview;
 import com.example.textrecoapp.ar.ScanningResult;
-import com.example.textrecoapp.ar.TrainSetHandler;
-import com.googlecode.tesseract.android.TessBaseAPI;
+import com.example.textrecoapp.characters.Character;
 
-public class MainActivity extends Activity implements ScanningResult {
+public class OCRActivity extends Activity implements ScanningResult {
+
+  public static final String EXTRAS_CHARACTER = "character";
 
   // settings
   public static final String PHOTO_TAKEN = "photo_taken";
-  public static final String LOG_TAG = "MainActivity";
+  public static final String LOG_TAG = "OCRActivity";
 
   private Camera camera;
 
@@ -33,31 +35,19 @@ public class MainActivity extends Activity implements ScanningResult {
   private Button scanBtn;
   private View progressBar;
 
-  // OCR
-  private TessBaseAPI ocrAPI;
+  private Character character;
+  private TextView hint;
+  private ImageView characterImg;
+  private Button nextHintBtn;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    TrainSetHandler tsh = new TrainSetHandler(this, "mkd");
-    tsh.initDirectory();
-
-    new Runnable() {
-
-      @Override
-      public void run() {
-        initOCR_API();
-      }
-    }.run();;
+    character = (Character) getIntent().getExtras().get(EXTRAS_CHARACTER);
 
     setContentView(R.layout.activity_main);
     initUI();
-  }
-
-  private void initOCR_API() {
-    ocrAPI = new TessBaseAPI();
-    ocrAPI.init(TrainSetHandler.DATA_PATH, "mkd");
   }
 
   private void initUI() {
@@ -65,6 +55,12 @@ public class MainActivity extends Activity implements ScanningResult {
     CameraPreview preview = new CameraPreview(this, camera);
     surfaceViewContainer = (FrameLayout) findViewById(R.id.surface_view_container);
     surfaceViewContainer.addView(preview);
+
+    hint = (TextView) findViewById(R.id.hint_view);
+    characterImg = (ImageView) findViewById(R.id.character_img);
+    nextHintBtn = (Button) findViewById(R.id.next_hint);
+
+    updateCharacterSpecificUI();
 
     scanBtn = (Button) findViewById(R.id.scan_btn);
     progressBar = findViewById(R.id.progress_overlay);
@@ -88,6 +84,18 @@ public class MainActivity extends Activity implements ScanningResult {
     });
   }
 
+  private void updateCharacterSpecificUI() {
+    hint.setText(character.getMission().getHint());
+    characterImg.setImageResource(UiUtils.getImageDrawableId(this, character.getPictureFilename()));
+    nextHintBtn.setOnClickListener(new View.OnClickListener() {
+
+      @Override
+      public void onClick(View v) {
+        hint.setText(character.getMission().getHint());
+      }
+    });
+  }
+
   private void prepareScanningDialog(final Bitmap bmp) {
     ImageView imgView = new ImageView(this);
     imgView.setImageBitmap(bmp);
@@ -100,7 +108,7 @@ public class MainActivity extends Activity implements ScanningResult {
 
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        ImageOcrProcessing task = new ImageOcrProcessing(progressBar, ocrAPI, MainActivity.this);
+        ImageOcrProcessing task = new ImageOcrProcessing(progressBar, App.getInstance().getOCR_API(), OCRActivity.this);
         task.execute(bmp);
       }
     };

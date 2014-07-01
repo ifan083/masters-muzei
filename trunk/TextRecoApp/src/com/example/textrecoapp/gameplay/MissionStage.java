@@ -7,9 +7,11 @@
 package com.example.textrecoapp.gameplay;
 
 import android.annotation.SuppressLint;
+
+import java.io.Serializable;
 import java.util.Random;
 
-public class MissionStage {
+public class MissionStage implements Serializable {
 
   private Artifact artifact;
   private Random randomGenerator;
@@ -24,12 +26,12 @@ public class MissionStage {
   }
 
   public String getHint() {
-    String[] sentences = artifact.getDescription().split(". ");
+    String[] sentences = artifact.getDescription().split("\\.");
 
     int sentenceIndicator = 0;
     do {
       sentenceIndicator = randomGenerator.nextInt(sentences.length);
-    } while (!isValidSentence(artifact.getName(), sentences[sentenceIndicator]));
+    } while (isValidSentence(artifact.getName(), sentences[sentenceIndicator]));
 
     return sentences[sentenceIndicator];
   }

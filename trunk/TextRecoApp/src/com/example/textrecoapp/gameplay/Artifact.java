@@ -6,7 +6,9 @@
  */
 package com.example.textrecoapp.gameplay;
 
-public class Artifact {
+import java.io.Serializable;
+
+public class Artifact implements Serializable {
 
   private String name;
   private String description;
