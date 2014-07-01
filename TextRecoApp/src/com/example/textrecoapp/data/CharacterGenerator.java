@@ -31,7 +31,7 @@ public class CharacterGenerator {
   private void init() {
     characters = new ArrayList<Character>();
 
-    Character character = new Character("Komita", "Ilinden", "komita");
+    Character character = new Character("Komita", "The Ilinden Uprising", "komita");
     characters.add(character);
 
     character = new Character("Partizan", "World wars", "partizan");

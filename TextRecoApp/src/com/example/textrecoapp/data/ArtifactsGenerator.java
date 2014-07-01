@@ -157,4 +157,8 @@ public class ArtifactsGenerator {
     }
     return diffLvls.size();
   }
+  
+  public List<Artifact> getAllArtifacts() {
+    return artifacts;
+  }
 }

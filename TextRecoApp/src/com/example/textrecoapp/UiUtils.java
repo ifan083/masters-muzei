@@ -46,4 +46,9 @@ public final class UiUtils {
     return stateList;
   }
 
+  public static int getImageDrawableId(Context context, String id) {
+    int drawableId = context.getResources().getIdentifier(id, RES_TYPE_DRAWABLE, context.getPackageName());
+    return drawableId;
+  }
+
 }

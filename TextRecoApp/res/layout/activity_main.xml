@@ -11,20 +11,62 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <Button
-            android:id="@+id/scan_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="Scan" />
-
         <View
             android:id="@+id/scan_area"
             android:layout_width="@dimen/scan_area_width"
             android:layout_height="@dimen/scan_area_height"
             android:layout_centerInParent="true"
             android:background="@drawable/scan_area_background" />
+
+        <Button
+            android:id="@+id/scan_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/scan_area"
+            android:textColor="@android:color/white"
+            android:layout_centerHorizontal="true"
+            android:text="@string/scan_btn" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp" >
+
+        <LinearLayout
+            android:id="@+id/hint_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="5dp" >
+
+            <TextView
+                android:id="@+id/hint_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/panel_background"
+                android:padding="15dp"
+                android:textColor="@android:color/white"
+                android:textStyle="italic" />
+
+            <Button
+                android:id="@+id/next_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next_hint"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_below="@id/hint_container"
+            android:id="@+id/character_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true" />
     </RelativeLayout>
 
     <include

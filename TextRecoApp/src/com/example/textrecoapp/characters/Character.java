@@ -17,7 +17,7 @@ public class Character implements Serializable {
 
   public static final boolean STATE_IN_PROGRESS = true;
   public static final boolean STATE_IDLE = false;
-  
+
   public static final int KNOWLEDGE_BASIC = 1;
   public static final int KNOWLEDGE_INTERMEDIATE = 2;
   public static final int KNOWLEDGE_SUPERIOR = 3;
@@ -70,6 +70,7 @@ public class Character implements Serializable {
 
   public void setMission(MissionContext mission) {
     this.mission = mission;
+    state = STATE_IN_PROGRESS;
   }
 
 }
