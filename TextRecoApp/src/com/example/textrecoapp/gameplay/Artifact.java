@@ -17,18 +17,21 @@ public class Artifact implements Serializable {
   private int difficulty; // rank
   private String category;
   private boolean unlockedArtifact;
+  private int floor;
 
   public Artifact(String name,
       String description,
       String category,
       String pictureFilename,
       float[] coordinatePercentages,
+      int floor,
       int difficulty) {
     this.name = name;
     this.description = description;
     this.category = category;
     this.pictureFilename = pictureFilename;
     this.coordinatePercentages = coordinatePercentages;
+    this.floor = floor;
     this.difficulty = difficulty;
   }
 
@@ -62,6 +65,10 @@ public class Artifact implements Serializable {
 
   public boolean isArtefactUnlocked() {
     return unlockedArtifact;
+  }
+  
+  public int getFloor() {
+    return floor;
   }
 
 }

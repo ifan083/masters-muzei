@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- General -->
     <string name="app_name">TextRecoApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="scan_btn">Scan</string>
+    <string name="retry">Retry</string>
+    <string name="submit">Submit</string>
+    <string name="title_scan_dialog">Result from scanning</string>
+    <string name="scanned_text">Scanned text:</string>
+    
 
     <!-- Missions -->
     <string name="mission_description_template">Gain %1$s knowledge in %2$s history.</string>

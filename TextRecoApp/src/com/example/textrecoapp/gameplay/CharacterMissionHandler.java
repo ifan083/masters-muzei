@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.textrecoapp.App;
 import com.example.textrecoapp.CharacterSelectorActivity;
 import com.example.textrecoapp.OCRActivity;
 import com.example.textrecoapp.R;
@@ -43,7 +44,7 @@ public class CharacterMissionHandler {
   private TextView missionProgress;
   private Button findArtifactBtn;
 
-  private Character character;
+  private int userSelectedDifficulty;
 
   public CharacterMissionHandler(Context context) {
     this.context = context;
@@ -52,13 +53,48 @@ public class CharacterMissionHandler {
     lockedDifficultyColor = android.R.color.darker_gray;
     currentDifficultyColor = android.R.color.holo_green_dark;
     unlockedDifficultyColor = android.R.color.holo_blue_dark;
+
+    userSelectedDifficulty = 1;
   }
 
-  public void handleMissionForCharacter(Character character, ViewGroup leftPanel, ViewGroup rightPanel) {
-    this.character = character;
+  public void handleMissionForCharacter(String characterName, ViewGroup leftPanel, ViewGroup rightPanel) {
+    App.getInstance().getCharacterManager().changeCharacter(characterName);
+
     // inflate layouts
     inflateLeftPanel(leftPanel);
     inflateRightPanel(rightPanel);
+
+    updatePanels();
+
+    startNewMissionBtn.setOnClickListener(startNewMissionListener);
+    findArtifactBtn.setOnClickListener(findArtefactListener);
+  }
+
+  private View.OnClickListener startNewMissionListener = new OnClickListener() {
+
+    @Override
+    public void onClick(View v) {
+      Character character = App.getInstance().getCharacterManager().getCharacter();
+      if (character.getMission() == null) {
+        // generate mission
+        // FIXME: currently, the name of the character is the category (should be fixed for each
+        // artifact in ArtifactsGenerator)
+        // TODO: extract the code below in a runnable object that will be passed as a result in the
+        // dialog passed in the else brackets
+        MissionContext mission =
+            MissionGenerator.getInstance().generateMissionForCharacter(context, character.getName(),
+                userSelectedDifficulty);
+        character.setMission(mission);
+        // update right panel
+        updatePanels();
+      } else {
+        Toast.makeText(context, "show dialog if user wants to stop current mission", Toast.LENGTH_SHORT).show();
+      }
+    }
+  };
+
+  private void updatePanels() {
+    Character character = App.getInstance().getCharacterManager().getCharacter();
 
     // populate always known data
     characterTitle.setText(character.getName());
@@ -71,7 +107,7 @@ public class CharacterMissionHandler {
     populateDifficultyLevels(character.getName(), character.getLatestUnlockedLevel());
 
     // check idle vs. current mission behavior
-    if (character.getState() == Character.STATE_IDLE) {
+    if (character.getMission() == null) {
       missionTitle.setText(context.getResources().getString(R.string.no_mission_in_progress));
       missionDescription.setText("\"" + context.getResources().getString(R.string.how_to_start_mission) + "\"");
       findArtifactBtn.setVisibility(View.GONE);
@@ -88,45 +124,10 @@ public class CharacterMissionHandler {
       findArtifactBtn.setVisibility(View.VISIBLE);
       missionProgressContainer.setVisibility(View.VISIBLE);
     }
-
-    startNewMissionBtn.setOnClickListener(startNewMissionListener);
-    findArtifactBtn.setOnClickListener(findArtefactListener);
-  }
-
-  private View.OnClickListener startNewMissionListener = new OnClickListener() {
-
-    @Override
-    public void onClick(View v) {
-      if (character.getState() == Character.STATE_IDLE) {
-        // generate mission
-        // TODO: store the selected difficulty level
-        // FIXME: currently, the name of the character is the category (should be fixed for each
-        // artifact in ArtifactsGenerator)
-        // TODO: extract the code below in a runnable object that will be passed as a result in the
-        // dialog passed in the else brackets
-        MissionContext mission =
-            MissionGenerator.getInstance().generateMissionForCharacter(context, character.getName(), 1);
-        character.setMission(mission);
-        // update right panel
-        updateRightPanelWithMission();
-      } else {
-        Toast.makeText(context, "show dialog if user wants to stop current mission", Toast.LENGTH_SHORT).show();
-      }
-    }
-  };
-
-  private void updateRightPanelWithMission() {
-    int missionDificulty = character.getMission().getDifficulty();
-
-    missionTitle.setText(character.getMission().getTitle());
-    missionDescription.setText(formatMissionDescription(missionDificulty));
-    missionProgress.setText(character.getMission().getMissionProgress());
-    missionProgressContainer.setVisibility(View.VISIBLE);
-    findArtifactBtn.setVisibility(View.VISIBLE);
-    highlightCurrentMissionDifficulty(missionDificulty);
   }
 
   private String formatMissionDescription(int difficulty) {
+    Character character = App.getInstance().getCharacterManager().getCharacter();
     String difficultyDescription = GameplayUtils.getDifficultyDescriptor(context, difficulty);
     String templateString2 = context.getResources().getString(R.string.mission_description_template);
     String formattedString = String.format(templateString2, difficultyDescription, character.getCategory());
@@ -140,7 +141,6 @@ public class CharacterMissionHandler {
       CharacterSelectorActivity activity = (CharacterSelectorActivity) context;
 
       Intent intent = new Intent(context, OCRActivity.class);
-      intent.putExtra(OCRActivity.EXTRAS_CHARACTER, character);
       activity.startActivityForResult(intent, CharacterSelectorActivity.REQ_CODE_OCR);
     }
   };
@@ -202,12 +202,34 @@ public class CharacterMissionHandler {
     @Override
     public void onClick(View v) {
       TextView tv = (TextView) v;
-      Toast.makeText(context, tv.getText() + " was clicked", Toast.LENGTH_SHORT).show();
+      userSelectedDifficulty = Integer.parseInt(String.valueOf(tv.getText()));
     }
   };
 
-  public void handleResultFromOCR(String result) {
-    Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+  public void handleResultFromOCR(int result) {
+    Character character = App.getInstance().getCharacterManager().getCharacter();
+    switch (result) {
+      case MissionContext.STAGE_PASSED:
+        Toast.makeText(context, "Mission Stage Passed", Toast.LENGTH_SHORT).show();
+        break;
+
+      case MissionContext.STAGE_FAILED:
+        // do nothing
+        Toast.makeText(context, "Mission Stage Failed", Toast.LENGTH_SHORT).show();
+        break;
+
+      case MissionContext.MISSION_COMPLETE:
+        Toast.makeText(context, "Mission finished", Toast.LENGTH_SHORT).show();
+        // remove the mission
+        character.setMission(null);
+
+        // check achievements
+
+        // update unlocked level
+        character.unlockNewLevel();
+        break;
+    }
+    updatePanels();
   }
 
 }

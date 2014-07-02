@@ -8,15 +8,13 @@ package com.example.textrecoapp.characters;
 
 import java.io.Serializable;
 
+import com.example.textrecoapp.data.ArtifactsGenerator;
 import com.example.textrecoapp.gameplay.MissionContext;
 
 /**
  * AKA Category.
  */
 public class Character implements Serializable {
-
-  public static final boolean STATE_IN_PROGRESS = true;
-  public static final boolean STATE_IDLE = false;
 
   public static final int KNOWLEDGE_BASIC = 1;
   public static final int KNOWLEDGE_INTERMEDIATE = 2;
@@ -36,7 +34,6 @@ public class Character implements Serializable {
     this.category = category;
     this.pictureFilename = pictureFilename;
 
-    state = STATE_IDLE;
     latestUnlockedLevel = 1;
   }
 
@@ -70,7 +67,12 @@ public class Character implements Serializable {
 
   public void setMission(MissionContext mission) {
     this.mission = mission;
-    state = STATE_IN_PROGRESS;
   }
 
+  public void unlockNewLevel() {
+    int total = ArtifactsGenerator.getInstance().getTotalLevelsForCategory(name);
+    if (total > latestUnlockedLevel) {
+      latestUnlockedLevel++;
+    }
+  }
 }

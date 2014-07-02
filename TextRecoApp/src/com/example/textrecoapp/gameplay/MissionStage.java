@@ -31,13 +31,13 @@ public class MissionStage implements Serializable {
     int sentenceIndicator = 0;
     do {
       sentenceIndicator = randomGenerator.nextInt(sentences.length);
-    } while (isValidSentence(artifact.getName(), sentences[sentenceIndicator]));
+    } while (isNotValidSentence(artifact.getName(), sentences[sentenceIndicator]));
 
     return sentences[sentenceIndicator];
   }
 
   @SuppressLint("DefaultLocale")
-  private boolean isValidSentence(String answer, String sentence) {
+  private boolean isNotValidSentence(String answer, String sentence) {
     return sentence.toLowerCase().contains(answer);
   }
 

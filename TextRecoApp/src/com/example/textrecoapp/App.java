@@ -7,6 +7,8 @@
 package com.example.textrecoapp;
 
 import com.example.textrecoapp.ar.TrainSetHandler;
+import com.example.textrecoapp.characters.CharacterManager;
+import com.example.textrecoapp.data.CharacterGenerator;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 import android.app.Application;
@@ -15,6 +17,7 @@ public class App extends Application {
 
   private static App instance;
   private TessBaseAPI ocrAPI;
+  private CharacterManager characterManager;
 
   public static App getInstance() {
     return instance;
@@ -33,9 +36,15 @@ public class App extends Application {
         ocrAPI.init(TrainSetHandler.DATA_PATH, "mkd");
       }
     }.run();;
+    
+    characterManager = new CharacterManager(CharacterGenerator.getInstance().getCharacters());
   }
 
   public TessBaseAPI getOCR_API() {
     return ocrAPI;
+  }
+  
+  public CharacterManager getCharacterManager() {
+    return characterManager;
   }
 }
