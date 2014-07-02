@@ -6,8 +6,6 @@
  */
 package com.example.textrecoapp;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,7 +26,8 @@ import com.example.textrecoapp.gameplay.CharacterMissionHandler;
 public class CharacterSelectorActivity extends Activity {
 
   public static final int REQ_CODE_OCR = 3606;
-  
+  public static final String EXTRAS_MISSION_STATUS = "mission_status";
+
   private ViewGroup leftPanel;
   private ViewGroup rightPanel;
   private View characterBackground;
@@ -83,7 +82,7 @@ public class CharacterSelectorActivity extends Activity {
       for (int i = 0; i < characterContainer.getChildCount(); i++) {
         final View childView = characterContainer.getChildAt(i);
         if (!v.equals(childView)) {
-          fadeOutView(childView);
+          AnimationUtils.fadeOutView(childView);
         }
       }
 
@@ -96,30 +95,18 @@ public class CharacterSelectorActivity extends Activity {
       // animate
       v.animate().translationXBy(screenCenterX - left);
 
-      fadeInView(leftPanel);
-      fadeInView(rightPanel);
+      AnimationUtils.fadeInView(leftPanel);
+      AnimationUtils.fadeInView(rightPanel);
 
       if (v.getTag().equals("Cartographer")) {
         Toast.makeText(CharacterSelectorActivity.this, "Cartographer was clicked", Toast.LENGTH_SHORT).show();
       } else {
-        String characterNameId = String.valueOf(v.getTag());
-        Character character = findCharacterByName(characterNameId);
-        missionHandler.handleMissionForCharacter(character, leftPanel, rightPanel);
+        String characterName = String.valueOf(v.getTag());
+        missionHandler.handleMissionForCharacter(characterName, leftPanel, rightPanel);
       }
     }
 
   };
-
-  private Character findCharacterByName(String characterNameId) {
-    Character character = null;
-    for (Character c : CharacterGenerator.getInstance().getCharacters()) {
-      if (characterNameId.equals(c.getName())) {
-        character = c;
-        break;
-      }
-    }
-    return character;
-  }
 
   private void loadCharacters() {
     LinearLayout.LayoutParams params =
@@ -146,32 +133,15 @@ public class CharacterSelectorActivity extends Activity {
     for (int i = 0; i < characterContainer.getChildCount(); i++) {
       final View childView = characterContainer.getChildAt(i);
       if (!childView.equals(selectedView)) {
-        fadeInView(childView);
+        AnimationUtils.fadeInView(childView);
       }
     }
 
     selectedView.animate().translationXBy(selectedViewLeft - screenCenterX);
     selectedView = null;
 
-    fadeOutView(leftPanel);
-    fadeOutView(rightPanel);
-  }
-
-  private void fadeInView(View view) {
-    view.setAlpha(0f);
-    view.setVisibility(View.VISIBLE);
-    view.animate().alpha(1f);
-  }
-
-  private void fadeOutView(final View view) {
-    view.animate().alpha(0f).setListener(new AnimatorListenerAdapter() {
-
-      public void onAnimationEnd(Animator animation) {
-        view.setVisibility(View.INVISIBLE);
-        view.setAlpha(1f);
-        view.animate().setListener(null);
-      }
-    });
+    AnimationUtils.fadeOutView(leftPanel);
+    AnimationUtils.fadeOutView(rightPanel);
   }
 
   @Override
@@ -182,11 +152,15 @@ public class CharacterSelectorActivity extends Activity {
       goBackToNormal();
     }
   }
-  
+
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    missionHandler.handleResultFromOCR("Result");
+
+    if (requestCode == REQ_CODE_OCR && resultCode == RESULT_OK) {
+      int result = data.getExtras().getInt(EXTRAS_MISSION_STATUS);
+      missionHandler.handleResultFromOCR(result);
+    }
   }
 
 }

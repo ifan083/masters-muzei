@@ -3,6 +3,7 @@ package com.example.textrecoapp;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -14,15 +15,11 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.example.textrecoapp.ar.CameraPreview;
 import com.example.textrecoapp.ar.ScanningResult;
 import com.example.textrecoapp.characters.Character;
 
 public class OCRActivity extends Activity implements ScanningResult {
-
-  public static final String EXTRAS_CHARACTER = "character";
 
   // settings
   public static final String PHOTO_TAKEN = "photo_taken";
@@ -35,16 +32,17 @@ public class OCRActivity extends Activity implements ScanningResult {
   private Button scanBtn;
   private View progressBar;
 
-  private Character character;
   private TextView hint;
   private ImageView characterImg;
   private Button nextHintBtn;
 
+  private ImageView scannedImage;
+  private TextView scannedResult;
+  private AlertDialog dialog;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    character = (Character) getIntent().getExtras().get(EXTRAS_CHARACTER);
 
     setContentView(R.layout.activity_main);
     initUI();
@@ -85,6 +83,7 @@ public class OCRActivity extends Activity implements ScanningResult {
   }
 
   private void updateCharacterSpecificUI() {
+    final Character character = App.getInstance().getCharacterManager().getCharacter();
     hint.setText(character.getMission().getHint());
     characterImg.setImageResource(UiUtils.getImageDrawableId(this, character.getPictureFilename()));
     nextHintBtn.setOnClickListener(new View.OnClickListener() {
@@ -97,19 +96,38 @@ public class OCRActivity extends Activity implements ScanningResult {
   }
 
   private void prepareScanningDialog(final Bitmap bmp) {
-    ImageView imgView = new ImageView(this);
-    imgView.setImageBitmap(bmp);
+    View view = getLayoutInflater().inflate(R.layout.scan_dialog_layout, null);
 
-    String title = "Scanned area";
-    String posBtnText = "Scan image";
-    String negBtnText = "Retry";
+    scannedResult = (TextView) view.findViewById(R.id.scan_result_tv);
+    scannedImage = (ImageView) view.findViewById(R.id.scanned_imag);
+    scannedImage.setImageBitmap(bmp);
+
+    ImageOcrProcessing task = new ImageOcrProcessing(progressBar, App.getInstance().getOCR_API(), OCRActivity.this);
+    task.execute(bmp);
+
+    String title = getResources().getString(R.string.title_scan_dialog);
+    String posBtnText = getResources().getString(R.string.submit);
+    String negBtnText = getResources().getString(R.string.retry);
 
     DialogInterface.OnClickListener posListener = new DialogInterface.OnClickListener() {
 
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        ImageOcrProcessing task = new ImageOcrProcessing(progressBar, App.getInstance().getOCR_API(), OCRActivity.this);
-        task.execute(bmp);
+        Character character = App.getInstance().getCharacterManager().getCharacter();
+        int result = character.getMission().tryAnswer(String.valueOf(scannedResult.getText()));
+        Intent intent = new Intent();
+        intent.putExtra(CharacterSelectorActivity.EXTRAS_MISSION_STATUS, result);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+
+        // if correct answer --> show map (unlock artifact if locked or proceed to next stage in
+        // previous window)
+
+        // if not wrong answer
+        // --> if found in artifacts --> show map with scanned artifact position and circle where
+        // the
+        // required artifact is placed
+        // --> if not found in artifacts --> show toast 'no such artifact exists'
       }
     };
 
@@ -121,9 +139,7 @@ public class OCRActivity extends Activity implements ScanningResult {
       }
     };
 
-    AlertDialog dialog =
-        UiUtils.createDialogWithImageView(this, title, posBtnText, negBtnText, imgView, posListener, negListener);
-    dialog.show();
+    dialog = UiUtils.createDialogWithImageView(this, title, posBtnText, negBtnText, view, posListener, negListener);
   }
 
   private Bitmap prepareBitmapFromCamera(byte[] data, int scanAreaWidth, int scanAreaHeight) {
@@ -164,8 +180,8 @@ public class OCRActivity extends Activity implements ScanningResult {
 
   @Override
   public void onScanningFinished(String resultString) {
-    Toast.makeText(this, resultString, Toast.LENGTH_SHORT).show();
-    camera.startPreview();
+    scannedResult.setText(resultString);
+    dialog.show();
   }
 
 }
