@@ -6,33 +6,31 @@
  */
 package com.example.textrecoapp.map;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.example.textrecoapp.gameplay.Artifact;
-
 public class StoreyState {
 
   private String storeyMapFilename;
-  private List<Artifact> pins;
+  private List<Pin> pins;
 
-  public StoreyState(String storeyMapFilename, List<Artifact> pins) {
+  public StoreyState(String storeyMapFilename) {
     this.storeyMapFilename = storeyMapFilename;
-    this.pins = pins;
-    sortByVerticalCoordinate(this.pins);
+    pins = new ArrayList<Pin>();
   }
 
-  private void sortByVerticalCoordinate(List<Artifact> pins) {
+  public void sortByVerticalCoordinate() {
     Collections.sort(pins, verticalCoordinateComparator);
   }
 
-  private Comparator<Artifact> verticalCoordinateComparator = new Comparator<Artifact>() {
+  private Comparator<Pin> verticalCoordinateComparator = new Comparator<Pin>() {
 
     @Override
-    public int compare(Artifact lhs, Artifact rhs) {
-      float lhsY = lhs.getCoordinatePercentages()[1];
-      float rhsY = rhs.getCoordinatePercentages()[1];
+    public int compare(Pin lhs, Pin rhs) {
+      float lhsY = lhs.getY();
+      float rhsY = rhs.getY();
 
       if (lhsY < rhsY) {
         return -1;
@@ -47,7 +45,7 @@ public class StoreyState {
     return storeyMapFilename;
   }
 
-  public List<Artifact> getPins() {
+  public List<Pin> getPins() {
     return pins;
   }
 

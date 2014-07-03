@@ -4,36 +4,31 @@
  * only with the written permission of Netcetera AG or in accordance with the terms and conditions
  * stipulated in the agreement/contract under which the program(s) have been supplied.
  */
-package com.example.textrecoapp.characters;
+package com.example.textrecoapp.map;
 
-import java.util.Map;
+import java.util.List;
 
 import com.example.textrecoapp.gameplay.Artifact;
 
 public class Cartographer {
 
-  private String mapFilename;
-  // NOTE: boolean value: unlocked(true) vs. locked(false) artifact
-  private Map<Artifact, Boolean> artifacts;
+  private BuildingNavigator navigator;
+  private List<Artifact> artifacts;
 
-  public Cartographer(String mapFilename, Map<Artifact, Boolean> artifacts) {
-    this.mapFilename = mapFilename;
+  public Cartographer(List<Floor> floors, List<Artifact> artifacts) {
     this.artifacts = artifacts;
+    navigator = new BuildingNavigator(floors, this.artifacts);
   }
 
-  public String getMapFilename() {
-    return mapFilename;
-  }
-
-  public Map<Artifact, Boolean> getArtifacts() {
+  public List<Artifact> getArtifacts() {
     return artifacts;
   }
 
   public Artifact findArtifact(String artifactName) {
     Artifact desiredArtifact = null;
-    for (Map.Entry<Artifact, Boolean> entry : artifacts.entrySet()) {
-      if (entry.getKey().getName().equals(artifactName)) {
-        desiredArtifact = entry.getKey();
+    for (Artifact a : artifacts) {
+      if (a.getName().equals(artifactName)) {
+        desiredArtifact = a;
         break;
       }
     }
@@ -41,8 +36,11 @@ public class Cartographer {
   }
 
   public void unlockArtifact(Artifact artifact) {
-    artifacts.remove(artifact);
-    artifacts.put(artifact, new Boolean(true));
+    artifact.unlockArtefact();
   }
 
+  public BuildingNavigator getNavigator() {
+    return navigator;
+  }
+  
 }

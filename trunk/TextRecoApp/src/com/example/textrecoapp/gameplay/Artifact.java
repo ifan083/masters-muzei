@@ -8,30 +8,29 @@ package com.example.textrecoapp.gameplay;
 
 import java.io.Serializable;
 
+import com.example.textrecoapp.map.Location;
+
 public class Artifact implements Serializable {
 
   private String name;
   private String description;
   private String pictureFilename;
-  private float[] coordinatePercentages;
   private int difficulty; // rank
   private String category;
   private boolean unlockedArtifact;
-  private int floor;
-
+  private Location location;
+  
   public Artifact(String name,
       String description,
       String category,
       String pictureFilename,
-      float[] coordinatePercentages,
-      int floor,
+      Location location,
       int difficulty) {
     this.name = name;
     this.description = description;
     this.category = category;
     this.pictureFilename = pictureFilename;
-    this.coordinatePercentages = coordinatePercentages;
-    this.floor = floor;
+    this.location = location;
     this.difficulty = difficulty;
   }
 
@@ -41,10 +40,6 @@ public class Artifact implements Serializable {
 
   public String getPictureFilename() {
     return pictureFilename;
-  }
-
-  public float[] getCoordinatePercentages() {
-    return coordinatePercentages;
   }
 
   public int getDifficulty() {
@@ -66,9 +61,14 @@ public class Artifact implements Serializable {
   public boolean isArtefactUnlocked() {
     return unlockedArtifact;
   }
-  
-  public int getFloor() {
-    return floor;
+
+  public String getFloorId() {
+    return location.getFloorId();
   }
+  
+  public Location getLocation() {
+    return location;
+  }
+
 
 }
