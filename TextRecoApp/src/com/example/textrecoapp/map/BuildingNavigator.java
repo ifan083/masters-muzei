@@ -6,45 +6,37 @@
  */
 package com.example.textrecoapp.map;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import com.example.textrecoapp.gameplay.Artifact;
+import java.util.Map;
 
-import android.content.Context;
-import android.util.SparseArray;
+import com.example.textrecoapp.gameplay.Artifact;
 
 public class BuildingNavigator {
 
-  private Context context;
-
-  private SparseArray<StoreyState> storeys;
+  private Map<String, StoreyState> storeys;
   private StoreyState currentStorey;
 
-  public BuildingNavigator(Context context, List<Artifact> allArtifacts) {
-    this.context = context;
-    filterPinsByStorey(allArtifacts);
+  public BuildingNavigator(List<Floor> floors, List<Artifact> artifacts) {
+    filterPinsByStorey(floors, artifacts);
   }
 
-  private void filterPinsByStorey(List<Artifact> allArtifacts) {
-    storeys = new SparseArray<StoreyState>();
-
-    SparseArray<List<Artifact>> tempStoreys = new SparseArray<List<Artifact>>();
-
-    for (Artifact a : allArtifacts) {
-      if (tempStoreys.get(a.getFloor()) == null) {
-        tempStoreys.put(a.getFloor(), new ArrayList<Artifact>());
-      }
-      tempStoreys.get(a.getFloor()).add(a);
+  private void filterPinsByStorey(List<Floor> floors, List<Artifact> artifacts) {
+    storeys = new HashMap<String, StoreyState>();
+    for (Floor f : floors) {
+      StoreyState storey = new StoreyState(f.getPictureFilename());
+      storeys.put(f.getFloorId(), storey);
     }
-
-    for (int i = 0; i < tempStoreys.size(); i++) {
-      storeys.put(tempStoreys.keyAt(i), new StoreyState(null, tempStoreys.valueAt(i)));
+    for (Artifact a : artifacts) {
+      storeys.get(a.getFloorId()).getPins().add(new Pin(a));
     }
-
+    for (Floor f : floors) {
+      storeys.get(f.getFloorId()).sortByVerticalCoordinate();
+    }
   }
 
-  public void changeStorey(int floor) {
-    currentStorey = storeys.get(floor);
+  public void changeStorey(String floorId) {
+    currentStorey = storeys.get(floorId);
   }
 
   public StoreyState getStoreyState() {

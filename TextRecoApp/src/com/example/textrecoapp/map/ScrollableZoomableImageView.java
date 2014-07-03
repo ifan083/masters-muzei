@@ -35,13 +35,13 @@ public class ScrollableZoomableImageView extends ImageView {
    * Matrix that saves the current state of the image. It contains the latest transformations
    * (scaling, translation).
    */
-  protected Matrix matrix;
+  protected Matrix mapMatrix;
 
   // We can be in one of these 4 states
   private static final int NONE = 0;
   private static final int DRAG = 1;
   private static final int ZOOM = 2;
-  private static final int CLICK = 3;
+  private static final int CLICK = 5;
   private int mode = NONE;
 
   // Remember some things for zooming
@@ -85,9 +85,9 @@ public class ScrollableZoomableImageView extends ImageView {
   private void sharedConstructing(Context context) {
     super.setClickable(true);
     mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
-    matrix = new Matrix();
+    mapMatrix = new Matrix();
     m = new float[9];
-    setImageMatrix(matrix);
+    setImageMatrix(mapMatrix);
     setScaleType(ScaleType.MATRIX);
 
     setOnTouchListener(new OnTouchListener() {
@@ -110,7 +110,7 @@ public class ScrollableZoomableImageView extends ImageView {
               float deltaY = curr.y - last.y;
               float fixTransX = getFixDragTrans(deltaX, viewWidth, origWidth * saveScale);
               float fixTransY = getFixDragTrans(deltaY, viewHeight, origHeight * saveScale);
-              matrix.postTranslate(fixTransX, fixTransY);
+              mapMatrix.postTranslate(fixTransX, fixTransY);
               fixTrans();
               last.set(curr.x, curr.y);
             }
@@ -131,7 +131,7 @@ public class ScrollableZoomableImageView extends ImageView {
             break;
         }
 
-        setImageMatrix(matrix);
+        setImageMatrix(mapMatrix);
         invalidate();
         return true; // indicate event was handled
       }
@@ -166,9 +166,9 @@ public class ScrollableZoomableImageView extends ImageView {
       }
 
       if (origWidth * saveScale <= viewWidth || origHeight * saveScale <= viewHeight) {
-        matrix.postScale(mScaleFactor, mScaleFactor, viewWidth / 2, viewHeight / 2);
+        mapMatrix.postScale(mScaleFactor, mScaleFactor, viewWidth / 2, viewHeight / 2);
       } else {
-        matrix.postScale(mScaleFactor, mScaleFactor, detector.getFocusX(), detector.getFocusY());
+        mapMatrix.postScale(mScaleFactor, mScaleFactor, detector.getFocusX(), detector.getFocusY());
       }
 
       fixTrans();
@@ -177,7 +177,7 @@ public class ScrollableZoomableImageView extends ImageView {
   }
 
   private void fixTrans() {
-    matrix.getValues(m);
+    mapMatrix.getValues(m);
     float transX = m[Matrix.MTRANS_X];
     float transY = m[Matrix.MTRANS_Y];
 
@@ -185,7 +185,7 @@ public class ScrollableZoomableImageView extends ImageView {
     float fixTransY = getFixTrans(transY, viewHeight, origHeight * saveScale);
 
     if (fixTransX != 0 || fixTransY != 0) {
-      matrix.postTranslate(fixTransX, fixTransY);
+      mapMatrix.postTranslate(fixTransX, fixTransY);
     }
   }
 
@@ -248,7 +248,7 @@ public class ScrollableZoomableImageView extends ImageView {
       float scaleY = (float) viewHeight / (float) bmHeight;
       scale = Math.min(scaleX, scaleY);
       // scale = 1f;
-      matrix.setScale(scale, scale);
+      mapMatrix.setScale(scale, scale);
 
       // Center the image
       float redundantYSpace = (float) viewHeight - (scale * (float) bmHeight);
@@ -256,11 +256,11 @@ public class ScrollableZoomableImageView extends ImageView {
       redundantYSpace /= (float) 2;
       redundantXSpace /= (float) 2;
 
-      matrix.postTranslate(redundantXSpace, redundantYSpace);
+      mapMatrix.postTranslate(redundantXSpace, redundantYSpace);
 
       origWidth = viewWidth - 2 * redundantXSpace;
       origHeight = viewHeight - 2 * redundantYSpace;
-      setImageMatrix(matrix);
+      setImageMatrix(mapMatrix);
     }
     fixTrans();
   }
@@ -300,5 +300,9 @@ public class ScrollableZoomableImageView extends ImageView {
    */
   protected void handleClickEvent(int x, int y) {
     // empty on purpose
+  }
+  
+  public Matrix getMapMatrix() {
+    return mapMatrix;
   }
 }
