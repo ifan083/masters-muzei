@@ -16,12 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.Toast;
 
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.data.CharacterGenerator;
 import com.example.textrecoapp.gameplay.CartographerMapHandler;
 import com.example.textrecoapp.gameplay.CharacterMissionHandler;
+import com.example.textrecoapp.map.MapActivity;
 
 public class CharacterSelectorActivity extends Activity {
 
@@ -99,7 +99,10 @@ public class CharacterSelectorActivity extends Activity {
       AnimationUtils.fadeInView(rightPanel);
 
       if (v.getTag().equals("Cartographer")) {
-        Toast.makeText(CharacterSelectorActivity.this, "Cartographer was clicked", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(CharacterSelectorActivity.this, "Cartographer was clicked",
+        // Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(CharacterSelectorActivity.this, MapActivity.class);
+        startActivity(intent);
       } else {
         String characterName = String.valueOf(v.getTag());
         missionHandler.handleMissionForCharacter(characterName, leftPanel, rightPanel);
