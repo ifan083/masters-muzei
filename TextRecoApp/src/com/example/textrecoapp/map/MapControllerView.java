@@ -6,29 +6,31 @@
  */
 package com.example.textrecoapp.map;
 
-import com.example.textrecoapp.gameplay.Artifact;
-
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.util.AttributeSet;
 
+import com.example.textrecoapp.R;
+import com.example.textrecoapp.UiUtils;
+import com.example.textrecoapp.gameplay.Artifact;
+
 public class MapControllerView extends ScrollableZoomableImageView {
 
   private BuildingNavigator navigator;
+
+  private Bitmap pinLocked;
+  private Bitmap pinUnlocked;
 
   private float[] matrixValues = new float[9];
 
   private int bitmapWidth;
   private int bitmapHeight;
 
-  // bitmaps
-  // locked
-  // unlocked
-  // toalet
-
+  // TODO: floor changes, special Utility icons (toilets, stairs, elevators)
   public MapControllerView(Context context, AttributeSet attrs) {
     super(context, attrs);
     init();
@@ -40,14 +42,22 @@ public class MapControllerView extends ScrollableZoomableImageView {
   }
 
   private void init() {
-    bitmapWidth = getDrawable().getIntrinsicWidth();
-    bitmapHeight = getDrawable().getIntrinsicHeight();
+    pinLocked = BitmapFactory.decodeResource(getResources(), R.drawable.pin_locked);
+    pinUnlocked = BitmapFactory.decodeResource(getResources(), R.drawable.pin_unlocked);
   }
 
   public void setNavigator(BuildingNavigator navigator) {
     this.navigator = navigator;
+    setLatestBlueprint();
+    bitmapWidth = getDrawable().getIntrinsicWidth();
+    bitmapHeight = getDrawable().getIntrinsicHeight();
     updatePinBitmaps();
     invalidate();
+  }
+
+  private void setLatestBlueprint() {
+    int blueprnitId = UiUtils.getImageDrawableId(getContext(), navigator.getStoreyState().getStoreyMapFilename());
+    setImageResource(blueprnitId);
   }
 
   private void updatePinBitmaps() {
@@ -57,12 +67,13 @@ public class MapControllerView extends ScrollableZoomableImageView {
   }
 
   private Bitmap getBitmapForArtifact(Artifact artifact) {
-    // TODO Auto-generated method stub
-    return null;
+    Bitmap bmp = artifact.isArtefactUnlocked() ? pinUnlocked : pinLocked;
+    return bmp;
   }
 
   private void changeFloor(String newFloorId) {
     navigator.changeStorey(newFloorId);
+    setLatestBlueprint();
     updatePinBitmaps();
     invalidate();
   }
@@ -72,6 +83,9 @@ public class MapControllerView extends ScrollableZoomableImageView {
     super.drawPins(canvas);
     calculateNewestMatrixChanges();
 
+    for (Pin p : navigator.getStoreyState().getPins()) {
+      drawPin(canvas, p);
+    }
   }
 
   private void calculateNewestMatrixChanges() {

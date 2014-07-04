@@ -246,7 +246,8 @@ public class ScrollableZoomableImageView extends ImageView {
       // TODO iii, handle initial scaling value
       float scaleX = (float) viewWidth / (float) bmWidth;
       float scaleY = (float) viewHeight / (float) bmHeight;
-      scale = Math.min(scaleX, scaleY);
+//      scale = Math.min(scaleX, scaleY);
+      scale = Math.max(scaleX, scaleY);
       // scale = 1f;
       mapMatrix.setScale(scale, scale);
 
