@@ -29,10 +29,10 @@ public class FloorGenerator {
   private void init() {
     floors = new ArrayList<Floor>();
 
-    Floor floor = new Floor("01_surface", "map1", 0);
+    Floor floor = new Floor("01_surface", "ground_floor", 0);
     floors.add(floor);
 
-    floor = new Floor("02_second", "map2", 1);
+    floor = new Floor("02_second", "first_floor", 1);
     floors.add(floor);
   }
 

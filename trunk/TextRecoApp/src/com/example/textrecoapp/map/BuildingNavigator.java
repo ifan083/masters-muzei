@@ -19,6 +19,8 @@ public class BuildingNavigator {
 
   public BuildingNavigator(List<Floor> floors, List<Artifact> artifacts) {
     filterPinsByStorey(floors, artifacts);
+    //set the first one as default
+    changeStorey(floors.get(0).getFloorId());
   }
 
   private void filterPinsByStorey(List<Floor> floors, List<Artifact> artifacts) {
