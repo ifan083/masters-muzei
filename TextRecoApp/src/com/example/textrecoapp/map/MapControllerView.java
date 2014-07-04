@@ -47,6 +47,7 @@ public class MapControllerView extends ScrollableZoomableImageView {
   public void setNavigator(BuildingNavigator navigator) {
     this.navigator = navigator;
     updatePinBitmaps();
+    invalidate();
   }
 
   private void updatePinBitmaps() {
@@ -58,6 +59,12 @@ public class MapControllerView extends ScrollableZoomableImageView {
   private Bitmap getBitmapForArtifact(Artifact artifact) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  private void changeFloor(String newFloorId) {
+    navigator.changeStorey(newFloorId);
+    updatePinBitmaps();
+    invalidate();
   }
 
   @Override
