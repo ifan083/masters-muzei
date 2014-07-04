@@ -22,7 +22,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 /**
@@ -246,8 +248,16 @@ public class ScrollableZoomableImageView extends ImageView {
       // TODO iii, handle initial scaling value
       float scaleX = (float) viewWidth / (float) bmWidth;
       float scaleY = (float) viewHeight / (float) bmHeight;
-//      scale = Math.min(scaleX, scaleY);
-      scale = Math.max(scaleX, scaleY);
+
+      WindowManager windowManager = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+      int rotation = windowManager.getDefaultDisplay().getRotation();
+
+      if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+        // landscape
+        scale = Math.max(scaleX, scaleY);
+      } else {
+        scale = Math.min(scaleX, scaleY);
+      }
       // scale = 1f;
       mapMatrix.setScale(scale, scale);
 
@@ -302,7 +312,7 @@ public class ScrollableZoomableImageView extends ImageView {
   protected void handleClickEvent(int x, int y) {
     // empty on purpose
   }
-  
+
   public Matrix getMapMatrix() {
     return mapMatrix;
   }
