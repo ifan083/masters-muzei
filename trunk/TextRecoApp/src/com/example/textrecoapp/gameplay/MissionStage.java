@@ -41,4 +41,8 @@ public class MissionStage implements Serializable {
     return sentence.toLowerCase().contains(answer);
   }
 
+  public Artifact getArtifact() {
+    return artifact;
+  }
+
 }

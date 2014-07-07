@@ -9,8 +9,10 @@
  */
 package com.example.textrecoapp.map;
 
+import java.io.Serializable;
 
-public class Location {
+
+public class Location implements Serializable {
 
   private float xPercentage;
   private float yPercentage;

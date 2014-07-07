@@ -58,6 +58,7 @@ public class ScrollableZoomableImageView extends ImageView {
   private float saveScale = 1f;
   protected float origWidth;
   protected float origHeight;
+  
   int oldMeasuredWidth;
   int oldMeasuredHeight;
 
@@ -178,7 +179,7 @@ public class ScrollableZoomableImageView extends ImageView {
     }
   }
 
-  private void fixTrans() {
+  protected void fixTrans() {
     mapMatrix.getValues(m);
     float transX = m[Matrix.MTRANS_X];
     float transY = m[Matrix.MTRANS_Y];
@@ -297,7 +298,7 @@ public class ScrollableZoomableImageView extends ImageView {
    * 
    * @param canvas the view's canvas object
    */
-  protected void drawPins(Canvas canvas) {
+  protected void drawPins(@SuppressWarnings("unused") Canvas canvas) {
     // empty on purpose
   }
 
@@ -309,11 +310,39 @@ public class ScrollableZoomableImageView extends ImageView {
    * @param x the x-coordinate of the click event
    * @param y the y-coordinate of the click event
    */
-  protected void handleClickEvent(int x, int y) {
+  protected void handleClickEvent(@SuppressWarnings("unused") int x, @SuppressWarnings("unused") int y) {
     // empty on purpose
   }
 
   public Matrix getMapMatrix() {
     return mapMatrix;
+  }
+  
+  public void setMapMatrix(Matrix mapMatrix) {
+    this.mapMatrix = mapMatrix;
+  }
+  
+  public float getSaveScale() {
+    return saveScale;
+  }
+  
+  public void setSaveScale(float saveScale) {
+    this.saveScale = saveScale;
+  }
+  
+  public int getViewWidth() {
+    return viewWidth;
+  }
+  
+  public void setViewWidth(int viewWidth) {
+    this.viewWidth = viewWidth;
+  }
+  
+  public int getViewHeight() {
+    return viewHeight;
+  }
+
+  public void setViewHeight(int viewHeight) {
+    this.viewHeight = viewHeight;
   }
 }

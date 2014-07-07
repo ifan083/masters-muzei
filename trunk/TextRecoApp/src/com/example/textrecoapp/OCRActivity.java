@@ -15,9 +15,11 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.example.textrecoapp.ar.CameraPreview;
 import com.example.textrecoapp.ar.ScanningResult;
 import com.example.textrecoapp.characters.Character;
+import com.example.textrecoapp.gameplay.Artifact;
 
 public class OCRActivity extends Activity implements ScanningResult {
 
@@ -113,10 +115,17 @@ public class OCRActivity extends Activity implements ScanningResult {
 
       @Override
       public void onClick(DialogInterface dialog, int which) {
+        String scannedText = String.valueOf(scannedResult.getText());
+        
         Character character = App.getInstance().getCharacterManager().getCharacter();
-        int result = character.getMission().tryAnswer(String.valueOf(scannedResult.getText()));
+        //get the mission status
+        int result = character.getMission().tryAnswer(scannedText);
+        //find its state 
+        Artifact artifact = App.getInstance().getCartographer().findArtifact(scannedText);
+        
         Intent intent = new Intent();
         intent.putExtra(CharacterSelectorActivity.EXTRAS_MISSION_STATUS, result);
+        intent.putExtra(CharacterSelectorActivity.EXTRAS_MISSION_ARTIFACT, artifact);
         setResult(Activity.RESULT_OK, intent);
         finish();
 

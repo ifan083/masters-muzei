@@ -6,14 +6,19 @@
  */
 package com.example.textrecoapp.map;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.util.AttributeSet;
-
+import android.view.MotionEvent;
+import android.widget.Toast;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.UiUtils;
 import com.example.textrecoapp.gameplay.Artifact;
@@ -29,6 +34,9 @@ public class MapControllerView extends ScrollableZoomableImageView {
 
   private int bitmapWidth;
   private int bitmapHeight;
+
+  private Pin preparedPin;
+  private HelperCircle helperCircle;
 
   // TODO: floor changes, special Utility icons (toilets, stairs, elevators)
   public MapControllerView(Context context, AttributeSet attrs) {
@@ -60,7 +68,7 @@ public class MapControllerView extends ScrollableZoomableImageView {
     setImageResource(blueprnitId);
   }
 
-  private void updatePinBitmaps() {
+  public void updatePinBitmaps() {
     for (Pin p : navigator.getStoreyState().getPins()) {
       p.setBitmap(getBitmapForArtifact(p.getArtifact()));
     }
@@ -83,6 +91,22 @@ public class MapControllerView extends ScrollableZoomableImageView {
     super.drawPins(canvas);
     calculateNewestMatrixChanges();
 
+    if (preparedPin != null) {
+      Point p = transformMapToScreenPoint(preparedPin.getX(), preparedPin.getY());
+      UiUtils.drawHighlightedRectangle(canvas, p);
+    }
+
+    if (helperCircle != null) {
+      Point centerPoint = transformMapToScreenPoint(helperCircle.getCenter().x, helperCircle.getCenter().y);
+      Point periferalPoint = transformMapToScreenPoint(helperCircle.getPeriferial().x, helperCircle.getCenter().y);
+
+      float dx = centerPoint.x - periferalPoint.x;
+      float dy = centerPoint.y - periferalPoint.y;
+
+      int radius = (int) Math.sqrt(dx * dx + dy * dy);
+      UiUtils.drawCircle(canvas, centerPoint, radius);
+    }
+
     for (Pin p : navigator.getStoreyState().getPins()) {
       drawPin(canvas, p);
     }
@@ -96,6 +120,33 @@ public class MapControllerView extends ScrollableZoomableImageView {
   protected void handleClickEvent(int x, int y) {
     super.handleClickEvent(x, y);
 
+    for (Pin pin : navigator.getStoreyState().getPins()) {
+      int bitmapWidth = pin.getBitmap().getWidth();
+      int bitmapHeight = pin.getBitmap().getHeight();
+
+      Point point = transformMapToScreenPoint(pin.getX(), pin.getY());
+
+      Rect rect = new Rect(point.x - bitmapWidth, point.y - bitmapHeight, point.x + bitmapWidth, point.y);
+
+      if (rect.contains(x, y)) {
+        String text =
+            pin.getArtifact().getName() + " / " + (pin.getArtifact().isArtefactUnlocked() ? "unlocked" : "locked");
+        Toast.makeText(getContext(), text, bitmapHeight).show();
+      }
+    }
+
+  }
+
+  private void centerPinInsideScreen(float nodeXPercentage, float nodeYPercentage) {
+    Point pointOnScreen = transformMapToScreenPoint(nodeXPercentage, nodeYPercentage);
+    float deltaX = (getViewWidth() / 2) - pointOnScreen.x;
+    float deltaY = (getViewHeight() / 2) - pointOnScreen.y;
+
+    calculateNewestMatrixChanges();
+    getMapMatrix().postTranslate(deltaX, deltaY);
+    setMapMatrix(getMapMatrix());
+    setImageMatrix(getMapMatrix());
+    fixTrans();
   }
 
   protected Point transformMapToScreenPoint(float x, float y) {
@@ -112,5 +163,38 @@ public class MapControllerView extends ScrollableZoomableImageView {
     int offsetY = bitmap.getHeight() / 2;
     Point p = transformMapToScreenPoint(pin.getX(), pin.getY());
     canvas.drawBitmap(pin.getBitmap(), p.x - offsetX, p.y - offsetY, null);
+  }
+
+  public void markAndCenterPin(Pin preparedPin) {
+    this.preparedPin = preparedPin;
+
+    if (preparedPin != null) {
+      centerPinInsideScreen(preparedPin.getX(), preparedPin.getY());
+
+      new Handler().postDelayed(new Runnable() {
+
+        @Override
+        public void run() {
+          dispatchFakeTouchInTheMiddleOfTheScreen();
+        }
+      }, 300);
+    }
+  }
+
+  /**
+   * Dispatches touch event to the map view which corrects bad drawings caused by matrix
+   * transitions.
+   */
+  @SuppressLint("Recycle")
+  public void dispatchFakeTouchInTheMiddleOfTheScreen() {
+    dispatchTouchEvent(MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+        MotionEvent.ACTION_UP, getWidth() / 2f, getHeight() / 2f, 0));
+    performClick();
+    fixTrans();
+    invalidate();
+  }
+
+  public void setHelperCircle(HelperCircle circle) {
+    helperCircle = circle;
   }
 }

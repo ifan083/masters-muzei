@@ -9,6 +9,10 @@ package com.example.textrecoapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.StateListDrawable;
 import android.view.View;
 
@@ -51,4 +55,21 @@ public final class UiUtils {
     return drawableId;
   }
 
+  public static void drawHighlightedRectangle(Canvas canvas, Point point) {
+    Paint circlePaint = new Paint();
+    circlePaint.setStyle(Paint.Style.FILL);
+    circlePaint.setColor(Color.BLUE);
+    circlePaint.setAlpha(128);
+
+    canvas.drawCircle(point.x, point.y, 50, circlePaint);
+  }
+
+  public static void drawCircle(Canvas canvas, Point center, int radius) {
+    Paint circlePaint = new Paint();
+    circlePaint.setStyle(Paint.Style.FILL);
+    circlePaint.setColor(Color.RED);
+    circlePaint.setAlpha(128);
+    
+    canvas.drawCircle(center.x, center.y, radius, circlePaint);
+  }
 }
