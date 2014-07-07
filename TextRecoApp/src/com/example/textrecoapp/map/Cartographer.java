@@ -11,6 +11,8 @@ import java.util.List;
 import com.example.textrecoapp.gameplay.Artifact;
 
 public class Cartographer {
+  
+  public static final String CARTOGRAPHER = "cartographer";
 
   private BuildingNavigator navigator;
   private List<Artifact> artifacts;

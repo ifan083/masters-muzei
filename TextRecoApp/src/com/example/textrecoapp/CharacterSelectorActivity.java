@@ -19,23 +19,30 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.data.CharacterGenerator;
+import com.example.textrecoapp.gameplay.Artifact;
 import com.example.textrecoapp.gameplay.CartographerMapHandler;
 import com.example.textrecoapp.gameplay.CharacterMissionHandler;
-import com.example.textrecoapp.map.MapActivity;
+import com.example.textrecoapp.gameplay.MissionContext;
+import com.example.textrecoapp.map.Cartographer;
 
 public class CharacterSelectorActivity extends Activity {
 
   public static final int REQ_CODE_OCR = 3606;
   public static final String EXTRAS_MISSION_STATUS = "mission_status";
+  public static final String EXTRAS_MISSION_ARTIFACT = "mission_artifact";
 
   private ViewGroup leftPanel;
   private ViewGroup rightPanel;
+  private ViewGroup mapPanel;
+  private ImageView cartographerImageView;
   private View characterBackground;
   private LinearLayout characterContainer;
 
   private int screenCenterX;
   private View selectedView;
   private int selectedViewLeft;
+
+  private int cartographerLeft;
 
   private CharacterMissionHandler missionHandler;
   private CartographerMapHandler mapHandler;
@@ -52,6 +59,7 @@ public class CharacterSelectorActivity extends Activity {
 
   private void loadHandlers() {
     missionHandler = new CharacterMissionHandler(this);
+    mapHandler = new CartographerMapHandler(this, mapPanel);
   }
 
   private void initUI() {
@@ -62,10 +70,13 @@ public class CharacterSelectorActivity extends Activity {
 
     leftPanel = (ViewGroup) findViewById(R.id.left_info_panel);
     rightPanel = (ViewGroup) findViewById(R.id.right_info_panel);
+    mapPanel = (ViewGroup) findViewById(R.id.map_panel);
 
     // values
     DisplayMetrics metrics = getResources().getDisplayMetrics();
     screenCenterX = metrics.widthPixels / 2;
+
+    cartographerLeft = getResources().getDimensionPixelOffset(R.dimen.cartographer_left);
   }
 
   private View.OnClickListener characterClickListener = new OnClickListener() {
@@ -86,24 +97,23 @@ public class CharacterSelectorActivity extends Activity {
         }
       }
 
-      // translate to center of screen current view
-      int left = v.getLeft() + v.getWidth() / 2;
-      // store settings
       selectedView = v;
+      int left = v.getLeft() + v.getWidth() / 2;
       selectedViewLeft = left;
 
-      // animate
-      v.animate().translationXBy(screenCenterX - left);
+      if (v.getTag().equals(Cartographer.CARTOGRAPHER)) {
 
-      AnimationUtils.fadeInView(leftPanel);
-      AnimationUtils.fadeInView(rightPanel);
+        v.animate().translationX(cartographerLeft - left);
+        AnimationUtils.fadeInView(mapPanel);
 
-      if (v.getTag().equals("Cartographer")) {
-        // Toast.makeText(CharacterSelectorActivity.this, "Cartographer was clicked",
-        // Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(CharacterSelectorActivity.this, MapActivity.class);
-        startActivity(intent);
+        mapHandler.handleMapBrowsing();
       } else {
+
+        v.animate().translationXBy(screenCenterX - left);
+
+        AnimationUtils.fadeInView(leftPanel);
+        AnimationUtils.fadeInView(rightPanel);
+
         String characterName = String.valueOf(v.getTag());
         missionHandler.handleMissionForCharacter(characterName, leftPanel, rightPanel);
       }
@@ -115,12 +125,12 @@ public class CharacterSelectorActivity extends Activity {
     LinearLayout.LayoutParams params =
         new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-    ImageView cartographer = new ImageView(this);
-    cartographer.setLayoutParams(params);
-    cartographer.setTag("Cartographer");
-    cartographer.setImageDrawable(UiUtils.getStateDrawableForId(this, "cartographer", false));
-    cartographer.setOnClickListener(characterClickListener);
-    characterContainer.addView(cartographer);
+    cartographerImageView = new ImageView(this);
+    cartographerImageView.setLayoutParams(params);
+    cartographerImageView.setTag(Cartographer.CARTOGRAPHER);
+    cartographerImageView.setImageDrawable(UiUtils.getStateDrawableForId(this, "cartographer", false));
+    cartographerImageView.setOnClickListener(characterClickListener);
+    characterContainer.addView(cartographerImageView);
 
     for (Character character : CharacterGenerator.getInstance().getCharacters()) {
       ImageView iv = new ImageView(this);
@@ -140,11 +150,18 @@ public class CharacterSelectorActivity extends Activity {
       }
     }
 
-    selectedView.animate().translationXBy(selectedViewLeft - screenCenterX);
-    selectedView = null;
+    if (selectedView.getTag().equals(Cartographer.CARTOGRAPHER)) {
+      selectedView.animate().translationXBy(selectedViewLeft - cartographerLeft);
 
-    AnimationUtils.fadeOutView(leftPanel);
-    AnimationUtils.fadeOutView(rightPanel);
+      AnimationUtils.fadeOutView(mapPanel);
+    } else {
+      selectedView.animate().translationXBy(selectedViewLeft - screenCenterX);
+
+      AnimationUtils.fadeOutView(leftPanel);
+      AnimationUtils.fadeOutView(rightPanel);
+    }
+
+    selectedView = null;
   }
 
   @Override
@@ -162,7 +179,38 @@ public class CharacterSelectorActivity extends Activity {
 
     if (requestCode == REQ_CODE_OCR && resultCode == RESULT_OK) {
       int result = data.getExtras().getInt(EXTRAS_MISSION_STATUS);
+      Artifact artifact = (Artifact) data.getExtras().get(EXTRAS_MISSION_ARTIFACT);
+      resolveScanResult(result, artifact);
       missionHandler.handleResultFromOCR(result);
+    }
+  }
+
+  private void resolveScanResult(int result, Artifact artifact) {
+    switch (result) {
+      case MissionContext.STAGE_FAILED:
+        if (artifact != null) {
+          goBackToNormal();
+
+          cartographerImageView.performClick();
+
+          mapHandler.handleWrongExistingArtifactScanned(artifact);
+        } else {
+          missionHandler.handleResultFromOCR(result);
+        }
+        break;
+
+      case MissionContext.STAGE_PASSED:
+      case MissionContext.MISSION_COMPLETE:
+        if (!artifact.isArtefactUnlocked()) {
+          goBackToNormal();
+          cartographerImageView.performClick();
+          App.getInstance().getCartographer().unlockArtifact(artifact);
+          mapHandler.handleUnlockingArtifact(artifact);
+        }
+        missionHandler.handleResultFromOCR(result);
+
+      default:
+        break;
     }
   }
 

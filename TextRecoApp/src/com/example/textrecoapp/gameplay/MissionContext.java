@@ -62,4 +62,8 @@ public class MissionContext implements Serializable {
   public String getHint() {
     return stages.get(current).getHint();
   }
+  
+  public Artifact getArtifact() {
+    return stages.get(current).getArtifact();
+  }
 }
