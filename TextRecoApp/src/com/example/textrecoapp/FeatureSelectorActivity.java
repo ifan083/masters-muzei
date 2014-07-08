@@ -7,7 +7,6 @@
 package com.example.textrecoapp;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,8 +16,10 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 
+import com.example.textrecoapp.persistence.PersistedActivity;
+
 @SuppressLint("NewApi")
-public class FeatureSelectorActivity extends Activity {
+public class FeatureSelectorActivity extends PersistedActivity {
 
   private View characterBackground;
   private LinearLayout characterContainer;

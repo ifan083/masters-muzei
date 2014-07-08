@@ -11,6 +11,7 @@ import java.util.List;
 import android.app.Application;
 
 import com.example.textrecoapp.ar.TrainSetHandler;
+import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.characters.CharacterManager;
 import com.example.textrecoapp.data.ArtifactsGenerator;
 import com.example.textrecoapp.data.CharacterGenerator;
@@ -18,6 +19,7 @@ import com.example.textrecoapp.gameplay.Artifact;
 import com.example.textrecoapp.map.Cartographer;
 import com.example.textrecoapp.map.Floor;
 import com.example.textrecoapp.map.FloorGenerator;
+import com.example.textrecoapp.persistence.GSONPersister;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 public class App extends Application {
@@ -26,6 +28,7 @@ public class App extends Application {
   private TessBaseAPI ocrAPI;
   private CharacterManager characterManager;
   private Cartographer cartographer;
+  private GSONPersister persister;
 
   public static final String LANG = "mkd";
 
@@ -47,10 +50,28 @@ public class App extends Application {
       }
     }.run();;
 
-    characterManager = new CharacterManager(CharacterGenerator.getInstance().getCharacters());
+    persister = new GSONPersister();
+
+    initApp();
+  }
+
+  private void initApp() {
+    // characters
+    List<Character> characters = persister.getStoredCharacters();
+    if (characters == null) {
+      characters = CharacterGenerator.getInstance().getCharacters();
+    }
+    characterManager = new CharacterManager(characters);
+
+    // artifacts
     List<Floor> floors = FloorGenerator.getInstance().getFloors();
-    List<Artifact> artifacts = ArtifactsGenerator.getInstance().getAllArtifacts();
+    List<Artifact> artifacts = persister.getStoredArtifacts();
+    if (artifacts == null) {
+      artifacts = ArtifactsGenerator.getInstance().getAllArtifacts();
+    }
     cartographer = new Cartographer(floors, artifacts);
+
+    // TODO add achievements
   }
 
   public TessBaseAPI getOCR_API() {
@@ -64,4 +85,9 @@ public class App extends Application {
   public Cartographer getCartographer() {
     return cartographer;
   }
+
+  public GSONPersister getPersister() {
+    return persister;
+  }
+    
 }

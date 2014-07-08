@@ -8,12 +8,19 @@ package com.example.textrecoapp.gameplay;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 
 import com.example.textrecoapp.App;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.map.BuildingNavigator;
+import com.example.textrecoapp.map.Floor;
+import com.example.textrecoapp.map.FloorGenerator;
 import com.example.textrecoapp.map.HelperCircle;
 import com.example.textrecoapp.map.MapControllerView;
 import com.example.textrecoapp.map.Pin;
@@ -22,6 +29,7 @@ public class CartographerMapHandler {
 
   private Context context;
   private MapControllerView mapView;
+  private LinearLayout floorContainer;
 
   public CartographerMapHandler(Context context, ViewGroup panelView) {
     this.context = context;
@@ -29,6 +37,31 @@ public class CartographerMapHandler {
     mapView = (MapControllerView) panelView.findViewById(R.id.map_view);
     BuildingNavigator navigator = App.getInstance().getCartographer().getNavigator();
     mapView.setNavigator(navigator);
+
+    floorContainer = (LinearLayout) panelView.findViewById(R.id.floors_container);
+    populateFloors();
+  }
+
+  private View.OnClickListener floorChanger = new OnClickListener() {
+
+    @Override
+    public void onClick(View v) {
+      mapView.changeFloor(String.valueOf(v.getTag()));
+    }
+  };
+
+  private void populateFloors() {
+    LinearLayout.LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+    floorContainer.removeAllViews();
+    for (Floor floor : FloorGenerator.getInstance().getFloors()) {
+      Button btn = new Button(context);
+      btn.setText(String.valueOf(floor.getFloorLevel()));
+      btn.setTag(floor.getFloorId());
+      btn.setLayoutParams(params);
+      btn.setOnClickListener(floorChanger);
+      floorContainer.addView(btn);
+    }
   }
 
   public void handleUnlockingArtifact(Artifact artifact) {
@@ -52,7 +85,6 @@ public class CartographerMapHandler {
     mapView.markAndCenterPin(preparedPin);
 
     Toast.makeText(context, "The desired artifact is somewhere in the red area", Toast.LENGTH_SHORT).show();
-    // mark your location with artifact (input param)
 
     Artifact targetArtifact = App.getInstance().getCharacterManager().getCharacter().getMission().getArtifact();
     HelperCircle helperCircle = calculateHelperCircle(artifact, targetArtifact);

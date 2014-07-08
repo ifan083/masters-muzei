@@ -7,12 +7,14 @@
 package com.example.textrecoapp.gameplay;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import com.example.textrecoapp.App;
 import com.example.textrecoapp.CharacterSelectorActivity;
 import com.example.textrecoapp.OCRActivity;
 import com.example.textrecoapp.R;
+import com.example.textrecoapp.UiUtils;
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.data.ArtifactsGenerator;
 
@@ -32,6 +35,8 @@ public class CharacterMissionHandler {
   private int lockedDifficultyColor;
   private int currentDifficultyColor;
   private int unlockedDifficultyColor;
+  private int unselectedDificultyColor;
+  private int selectedDificultyColor;
 
   // views
   private TextView characterTitle;
@@ -53,12 +58,13 @@ public class CharacterMissionHandler {
     lockedDifficultyColor = android.R.color.darker_gray;
     currentDifficultyColor = android.R.color.holo_green_dark;
     unlockedDifficultyColor = android.R.color.holo_blue_dark;
-
-    userSelectedDifficulty = 1;
+    selectedDificultyColor = android.R.color.holo_red_dark;
+    unselectedDificultyColor = android.R.color.transparent;
   }
 
   public void handleMissionForCharacter(String characterName, ViewGroup leftPanel, ViewGroup rightPanel) {
     App.getInstance().getCharacterManager().changeCharacter(characterName);
+    userSelectedDifficulty = -1;
 
     // inflate layouts
     inflateLeftPanel(leftPanel);
@@ -77,19 +83,53 @@ public class CharacterMissionHandler {
       Character character = App.getInstance().getCharacterManager().getCharacter();
       if (character.getMission() == null) {
         // generate mission
-        // FIXME: currently, the name of the character is the category (should be fixed for each
-        // artifact in ArtifactsGenerator)
-        // TODO: extract the code below in a runnable object that will be passed as a result in the
-        // dialog passed in the else brackets
-        MissionContext mission =
-            MissionGenerator.getInstance().generateMissionForCharacter(context, character.getName(),
-                userSelectedDifficulty);
-        character.setMission(mission);
+
+        if (userSelectedDifficulty == -1) {
+          Toast.makeText(context, context.getString(R.string.select_dificulty), Toast.LENGTH_SHORT).show();
+          return;
+        }
+
+        missionGenerator.run();
         // update right panel
         updatePanels();
       } else {
-        Toast.makeText(context, "show dialog if user wants to stop current mission", Toast.LENGTH_SHORT).show();
+
+        String title = context.getString(R.string.dialog_mission_title);
+        String message = context.getString(R.string.dialog_mission_message);
+        String posBtnText = context.getString(R.string.start_new_mission);
+        String negBtnText = context.getString(R.string.cancel);
+
+        DialogInterface.OnClickListener posListener = new DialogInterface.OnClickListener() {
+
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            missionGenerator.run();
+          }
+        };
+
+        DialogInterface.OnClickListener negListener = new DialogInterface.OnClickListener() {
+
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+          }
+        };
+
+        UiUtils.createSimpleDialog(context, title, message, posBtnText, negBtnText, posListener, negListener).show();
+
       }
+    }
+  };
+
+  private Runnable missionGenerator = new Runnable() {
+
+    @Override
+    public void run() {
+      Character character = App.getInstance().getCharacterManager().getCharacter();
+      MissionContext mission =
+          MissionGenerator.getInstance().generateMissionForCharacter(context, character.getCategory(),
+              userSelectedDifficulty);
+      character.setMission(mission);
     }
   };
 
@@ -102,9 +142,7 @@ public class CharacterMissionHandler {
     String charDescription = String.format(templateString, character.getCategory());
     characterDescription.setText(charDescription);
 
-    // FIXME: currently, the name of the character is the category (should be fixed for each
-    // artifact in ArtifactsGenerator)
-    populateDifficultyLevels(character.getName(), character.getLatestUnlockedLevel());
+    populateDifficultyLevels(character.getCategory(), character.getLatestUnlockedLevel());
 
     // check idle vs. current mission behavior
     if (character.getMission() == null) {
@@ -184,6 +222,7 @@ public class CharacterMissionHandler {
     int totalLvls = ArtifactsGenerator.getInstance().getTotalLevelsForCategory(category);
     for (int i = 1; i <= totalLvls; i++) {
       View diffLayout = layoutInflater.inflate(R.layout.difficulty_level, null);
+      diffLayout.setBackgroundResource(unselectedDificultyColor);
       TextView tv = (TextView) diffLayout.findViewById(R.id.diff_tv);
       tv.setText(String.valueOf(i));
       if (i <= latestUnlocked) {
@@ -201,8 +240,14 @@ public class CharacterMissionHandler {
 
     @Override
     public void onClick(View v) {
+      for (int i = 0; i < difficultyContainer.getChildCount(); i++) {
+        View view = difficultyContainer.getChildAt(i);
+        view.setBackgroundResource(unselectedDificultyColor);
+      }
       TextView tv = (TextView) v;
       userSelectedDifficulty = Integer.parseInt(String.valueOf(tv.getText()));
+      FrameLayout fl = (FrameLayout) tv.getParent();
+      fl.setBackgroundResource(selectedDificultyColor);
     }
   };
 
@@ -223,7 +268,7 @@ public class CharacterMissionHandler {
         // remove the mission
         character.setMission(null);
 
-        // check achievements
+        // TODO: check achievements
 
         // update unlocked level
         character.unlockNewLevel();

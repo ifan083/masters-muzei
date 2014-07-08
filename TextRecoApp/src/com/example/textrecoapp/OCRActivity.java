@@ -128,15 +128,6 @@ public class OCRActivity extends Activity implements ScanningResult {
         intent.putExtra(CharacterSelectorActivity.EXTRAS_MISSION_ARTIFACT, artifact);
         setResult(Activity.RESULT_OK, intent);
         finish();
-
-        // if correct answer --> show map (unlock artifact if locked or proceed to next stage in
-        // previous window)
-
-        // if not wrong answer
-        // --> if found in artifacts --> show map with scanned artifact position and circle where
-        // the
-        // required artifact is placed
-        // --> if not found in artifacts --> show toast 'no such artifact exists'
       }
     };
 
