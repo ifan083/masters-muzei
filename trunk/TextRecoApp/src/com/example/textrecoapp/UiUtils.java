@@ -38,6 +38,21 @@ public final class UiUtils {
     return builder.create();
   }
 
+  public static AlertDialog createSimpleDialog(Context context,
+      String title,
+      String message,
+      String posBtnText,
+      String negBtnText,
+      DialogInterface.OnClickListener posListener,
+      DialogInterface.OnClickListener negListener) {
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    builder.setTitle(title).setMessage(message).setPositiveButton(posBtnText, posListener);
+    builder.setNegativeButton(negBtnText, negListener);
+
+    return builder.create();
+  }
+
   public static StateListDrawable getStateDrawableForId(Context context, String id, boolean hasPrefix) {
     String str_id_regular = (hasPrefix ? RES_PREFIX : "") + id;
     String str_id_pressed = (hasPrefix ? RES_PREFIX : "") + id + RES_HIGHLIGHTED;
@@ -69,7 +84,7 @@ public final class UiUtils {
     circlePaint.setStyle(Paint.Style.FILL);
     circlePaint.setColor(Color.RED);
     circlePaint.setAlpha(128);
-    
+
     canvas.drawCircle(center.x, center.y, radius, circlePaint);
   }
 }

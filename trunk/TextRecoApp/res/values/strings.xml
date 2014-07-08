@@ -10,6 +10,7 @@
     <string name="submit">Submit</string>
     <string name="title_scan_dialog">Result from scanning</string>
     <string name="scanned_text">Scanned text:</string>
+    <string name="cancel">Cancel</string>        
     
 
     <!-- Missions -->
@@ -18,6 +19,9 @@
     <string name="knowledge_intermediate">intermediate</string>
     <string name="knowledge_superior">superior</string>
     <string name="knowledge_expert">expert</string>
+    <string name="dialog_mission_title">Mission in progress</string>
+    <string name="dialog_mission_message">If you start new game all mission progress will be lost</string>
+    <string name="select_dificulty">First select mission difficulty</string>
 
     <!-- Panels -->
     <string name="mission_progress">Mission progress: </string>

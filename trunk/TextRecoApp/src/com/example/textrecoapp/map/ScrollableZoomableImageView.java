@@ -246,7 +246,6 @@ public class ScrollableZoomableImageView extends ImageView {
 
       Log.d("bmSize", "bmWidth: " + bmWidth + " bmHeight : " + bmHeight);
 
-      // TODO iii, handle initial scaling value
       float scaleX = (float) viewWidth / (float) bmWidth;
       float scaleY = (float) viewHeight / (float) bmHeight;
 

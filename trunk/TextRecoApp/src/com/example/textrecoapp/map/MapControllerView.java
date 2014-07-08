@@ -79,7 +79,7 @@ public class MapControllerView extends ScrollableZoomableImageView {
     return bmp;
   }
 
-  private void changeFloor(String newFloorId) {
+  public void changeFloor(String newFloorId) {
     navigator.changeStorey(newFloorId);
     setLatestBlueprint();
     updatePinBitmaps();
@@ -129,9 +129,10 @@ public class MapControllerView extends ScrollableZoomableImageView {
       Rect rect = new Rect(point.x - bitmapWidth, point.y - bitmapHeight, point.x + bitmapWidth, point.y);
 
       if (rect.contains(x, y)) {
-        String text =
-            pin.getArtifact().getName() + " / " + (pin.getArtifact().isArtefactUnlocked() ? "unlocked" : "locked");
+        
+        String text = pin.getArtifact().isArtefactUnlocked() ? pin.getArtifact().getName() : "locked";
         Toast.makeText(getContext(), text, bitmapHeight).show();
+        return;
       }
     }
 
