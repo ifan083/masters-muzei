@@ -18,9 +18,9 @@ import java.util.List;
 import android.os.Environment;
 import android.util.Log;
 
+import com.example.textrecoapp.achievements.Achievement;
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.gameplay.Artifact;
-import com.example.textrecoapp.gamification.Achievement;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

@@ -268,10 +268,12 @@ public class CharacterMissionHandler {
         // remove the mission
         character.setMission(null);
 
+        // update unlocked level
+        App.getInstance().getCharacterManager().getCharacter().unlockNewLevel();
+        
+        
         // TODO: check achievements
 
-        // update unlocked level
-        character.unlockNewLevel();
         break;
     }
     updatePanels();

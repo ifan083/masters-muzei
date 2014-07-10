@@ -159,6 +159,16 @@ public class ArtifactsGenerator {
     return diffLvls.size();
   }
   
+  public int getTotalArtifactsForCategoryAndDifficulty(String category, int difficulty) {
+    int counter = 0;
+    for (Artifact a : artifacts) {
+      if(a.getCategory().equals(category) && difficulty == a.getDifficulty()) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+  
   public List<Artifact> getAllArtifacts() {
     return artifacts;
   }
