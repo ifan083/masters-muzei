@@ -8,7 +8,7 @@ package com.example.textrecoapp.characters;
 
 import java.io.Serializable;
 
-import com.example.textrecoapp.data.ArtifactsGenerator;
+import com.example.textrecoapp.App;
 import com.example.textrecoapp.gameplay.MissionContext;
 
 /**
@@ -70,7 +70,7 @@ public class Character implements Serializable {
   }
 
   public void unlockNewLevel() {
-    int total = ArtifactsGenerator.getInstance().getTotalLevelsForCategory(name);
+    int total = App.getInstance().getCartographer().getTotalLevelsForCategory(name);
     if (total > latestUnlockedLevel) {
       latestUnlockedLevel++;
     }

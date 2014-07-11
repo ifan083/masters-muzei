@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.Toast;
 
+import com.example.textrecoapp.achievements.AchievementsActivity;
 import com.example.textrecoapp.persistence.PersistedActivity;
 
 @SuppressLint("NewApi")
@@ -40,6 +41,9 @@ public class FeatureSelectorActivity extends PersistedActivity {
 
       if (v.getTag().equals("Muzei")) {
         Intent intent = new Intent(FeatureSelectorActivity.this, CharacterSelectorActivity.class);
+        startActivity(intent);
+      } else if (v.getTag().equals("Achievements")) {
+        Intent intent = new Intent(FeatureSelectorActivity.this, AchievementsActivity.class);
         startActivity(intent);
       } else {
         Toast.makeText(FeatureSelectorActivity.this, String.valueOf(v.getTag()), Toast.LENGTH_SHORT).show();

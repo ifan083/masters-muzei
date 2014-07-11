@@ -132,7 +132,9 @@ public class CharacterSelectorActivity extends Activity {
     cartographerImageView.setOnClickListener(characterClickListener);
     characterContainer.addView(cartographerImageView);
 
-    for (Character character : CharacterGenerator.getInstance().getCharacters()) {
+    CharacterGenerator characterGenerator = new CharacterGenerator();
+    
+    for (Character character : characterGenerator.getCharacters()) {
       ImageView iv = new ImageView(this);
       iv.setLayoutParams(params);
       iv.setTag(character.getName());

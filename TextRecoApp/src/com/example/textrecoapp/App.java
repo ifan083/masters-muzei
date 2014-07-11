@@ -7,15 +7,19 @@
 package com.example.textrecoapp;
 
 import java.util.List;
+import java.util.Map;
 
 import android.app.Application;
 
+import com.example.textrecoapp.achievements.Achievement;
 import com.example.textrecoapp.ar.TrainSetHandler;
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.characters.CharacterManager;
 import com.example.textrecoapp.data.ArtifactsGenerator;
 import com.example.textrecoapp.data.CharacterGenerator;
 import com.example.textrecoapp.gameplay.Artifact;
+import com.example.textrecoapp.gamification.AchievementChecker;
+import com.example.textrecoapp.gamification.AchievementGenerator;
 import com.example.textrecoapp.map.Cartographer;
 import com.example.textrecoapp.map.Floor;
 import com.example.textrecoapp.map.FloorGenerator;
@@ -29,6 +33,8 @@ public class App extends Application {
   private CharacterManager characterManager;
   private Cartographer cartographer;
   private GSONPersister persister;
+  private AchievementChecker achievementChecker;
+  private Map<String, List<Achievement>> achievements;
 
   public static final String LANG = "mkd";
 
@@ -59,7 +65,8 @@ public class App extends Application {
     // characters
     List<Character> characters = persister.getStoredCharacters();
     if (characters == null) {
-      characters = CharacterGenerator.getInstance().getCharacters();
+      CharacterGenerator characterGenerator = new CharacterGenerator();
+      characters = characterGenerator.getCharacters();
     }
     characterManager = new CharacterManager(characters);
 
@@ -67,11 +74,16 @@ public class App extends Application {
     List<Floor> floors = FloorGenerator.getInstance().getFloors();
     List<Artifact> artifacts = persister.getStoredArtifacts();
     if (artifacts == null) {
-      artifacts = ArtifactsGenerator.getInstance().getAllArtifacts();
+      ArtifactsGenerator artifactsGenerator = new ArtifactsGenerator();
+      artifacts = artifactsGenerator.getArtifacts();
     }
     cartographer = new Cartographer(floors, artifacts);
 
-    // TODO add achievements
+    achievements = persister.getStoredAchievements();
+    if (achievements == null) {
+      AchievementGenerator achievementGenerator = new AchievementGenerator();
+      achievements = achievementGenerator.getAchievements();
+    }
   }
 
   public TessBaseAPI getOCR_API() {
@@ -89,5 +101,13 @@ public class App extends Application {
   public GSONPersister getPersister() {
     return persister;
   }
-    
+
+  public AchievementChecker getAchievementChecker() {
+    return achievementChecker;
+  }
+
+  public Map<String, List<Achievement>> getAchievements() {
+    return achievements;
+  }
+
 }

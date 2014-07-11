@@ -15,16 +15,7 @@ public class CharacterGenerator {
 
   private List<Character> characters;
 
-  private static CharacterGenerator generatorInstance;
-
-  public static CharacterGenerator getInstance() {
-    if (generatorInstance == null) {
-      generatorInstance = new CharacterGenerator();
-    }
-    return generatorInstance;
-  }
-
-  private CharacterGenerator() {
+  public CharacterGenerator() {
     init();
   }
 
