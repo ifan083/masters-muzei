@@ -7,7 +7,6 @@
 package com.example.textrecoapp.achievements;
 
 import com.example.textrecoapp.App;
-import com.example.textrecoapp.data.ArtifactsGenerator;
 import com.example.textrecoapp.gameplay.Artifact;
 import com.example.textrecoapp.gameplay.MissionContext;
 import com.example.textrecoapp.gamification.AchievementCriteria;
@@ -30,7 +29,7 @@ public class CheckArtifacts implements AchievementCriteria {
     }
 
     int totalRequestedArtifacts =
-        ArtifactsGenerator.getInstance().getTotalArtifactsForCategoryAndDifficulty(category, difficulty);
+        App.getInstance().getCartographer().getTotalArtifactsForCategoryAndDifficulty(category, difficulty);
 
     int counter = 0;
     for (Artifact a : App.getInstance().getCartographer().getArtifacts()) {
@@ -43,7 +42,7 @@ public class CheckArtifacts implements AchievementCriteria {
   }
 
   private boolean checkArtifactsByRank() {
-    int totalArtifacts = ArtifactsGenerator.getInstance().getAllArtifacts().size();
+    int totalArtifacts = App.getInstance().getCartographer().getAllArtifacts().size();
 
     int counter = 0;
     for (Artifact a : App.getInstance().getCartographer().getArtifacts()) {

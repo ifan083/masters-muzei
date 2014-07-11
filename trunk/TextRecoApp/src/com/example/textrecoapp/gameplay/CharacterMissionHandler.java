@@ -25,7 +25,6 @@ import com.example.textrecoapp.OCRActivity;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.UiUtils;
 import com.example.textrecoapp.characters.Character;
-import com.example.textrecoapp.data.ArtifactsGenerator;
 
 public class CharacterMissionHandler {
 
@@ -219,7 +218,8 @@ public class CharacterMissionHandler {
 
     difficultyContainer.removeAllViews();
 
-    int totalLvls = ArtifactsGenerator.getInstance().getTotalLevelsForCategory(category);
+    int totalLvls = App.getInstance().getCartographer().getTotalLevelsForCategory(category);
+
     for (int i = 1; i <= totalLvls; i++) {
       View diffLayout = layoutInflater.inflate(R.layout.difficulty_level, null);
       diffLayout.setBackgroundResource(unselectedDificultyColor);
@@ -270,8 +270,7 @@ public class CharacterMissionHandler {
 
         // update unlocked level
         App.getInstance().getCharacterManager().getCharacter().unlockNewLevel();
-        
-        
+
         // TODO: check achievements
 
         break;

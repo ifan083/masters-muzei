@@ -21,14 +21,17 @@ public class PersistedActivity extends Activity {
   protected void onStop() {
     super.onStop();
 
-    // App.getInstance().getPersister().storeAchievements(null);
+    App.getInstance().getPersister().storeAchievements(App.getInstance().getAchievements());
     App.getInstance().getPersister().storeArtifacts(App.getInstance().getCartographer().getArtifacts());
     storeCharacters();
   }
 
   private void storeCharacters() {
     List<Character> characters = new ArrayList<Character>();
-    for (Character c : CharacterGenerator.getInstance().getCharacters()) {
+    
+    CharacterGenerator characterGenerator = new CharacterGenerator();
+    
+    for (Character c : characterGenerator.getCharacters()) {
       App.getInstance().getCharacterManager().changeCharacter(c.getName());
       characters.add(App.getInstance().getCharacterManager().getCharacter());
     }

@@ -12,7 +12,7 @@ import java.util.Random;
 
 import android.content.Context;
 
-import com.example.textrecoapp.data.ArtifactsGenerator;
+import com.example.textrecoapp.App;
 
 public final class MissionGenerator {
 
@@ -44,7 +44,7 @@ public final class MissionGenerator {
   public MissionContext generateMissionForCharacter(Context context, String category, int difficulty) {
     // always get 3 artifacts for each mission
     List<Artifact> artifactsForMission = new ArrayList<Artifact>();
-    for (Artifact a : ArtifactsGenerator.getInstance().getAllArtifacts()) {
+    for (Artifact a : App.getInstance().getCartographer().getAllArtifacts()) {
       if (a.getCategory().equals(category) && a.getDifficulty() == difficulty) {
         artifactsForMission.add(a);
       }

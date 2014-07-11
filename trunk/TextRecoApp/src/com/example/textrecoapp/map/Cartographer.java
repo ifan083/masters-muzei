@@ -6,6 +6,7 @@
  */
 package com.example.textrecoapp.map;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.textrecoapp.gameplay.Artifact;
@@ -48,6 +49,34 @@ public class Cartographer {
 
   public BuildingNavigator getNavigator() {
     return navigator;
+  }
+
+  public int getTotalLevelsForCategory(String categoryName) {
+    List<Integer> diffLvls = new ArrayList<Integer>();
+    for (Artifact a : artifacts) {
+      if (a.getCategory().equals(categoryName)) {
+
+        if (!diffLvls.contains(Integer.valueOf(a.getDifficulty()))) {
+          diffLvls.add(Integer.valueOf(a.getDifficulty()));
+        }
+
+      }
+    }
+    return diffLvls.size();
+  }
+
+  public int getTotalArtifactsForCategoryAndDifficulty(String category, int difficulty) {
+    int counter = 0;
+    for (Artifact a : artifacts) {
+      if (a.getCategory().equals(category) && difficulty == a.getDifficulty()) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+
+  public List<Artifact> getAllArtifacts() {
+    return artifacts;
   }
 
 }

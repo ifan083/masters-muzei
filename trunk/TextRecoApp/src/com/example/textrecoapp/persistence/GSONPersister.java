@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 import android.os.Environment;
 import android.util.Log;
@@ -64,22 +65,22 @@ public class GSONPersister {
     writeFile(jsonCharacters, file);
   }
 
-  public List<Achievement> getStoredAchievements() {
+  public Map<String, List<Achievement>> getStoredAchievements() {
     File file = new File(Environment.getExternalStorageDirectory() + FOLDER + "/" + ACHIEVEMENTS);
     if (file.exists()) {
       String jsonAchievements = readFile(file);
       if (jsonAchievements == null) {
         return null;
       }
-      Type type = new TypeToken<List<Achievement>>() {}.getType();
-      List<Achievement> achievements = gson.fromJson(jsonAchievements, type);
+      Type type = new TypeToken<Map<String, List<Achievement>>>() {}.getType();
+      Map<String, List<Achievement>> achievements = gson.fromJson(jsonAchievements, type);
       return achievements;
     } else {
       return null;
     }
   }
 
-  public void storeAchievements(List<Achievement> achievements) {
+  public void storeAchievements(Map<String, List<Achievement>> achievements) {
     String jsonAchievements = gson.toJson(achievements);
     File file = new File(Environment.getExternalStorageDirectory() + FOLDER + "/" + ACHIEVEMENTS);
     writeFile(jsonAchievements, file);

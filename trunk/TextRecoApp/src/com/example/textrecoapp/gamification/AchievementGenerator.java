@@ -18,19 +18,10 @@ import com.example.textrecoapp.achievements.FirstMissionEver;
 
 public class AchievementGenerator {
 
-  private static AchievementGenerator instance;
-
   private Map<String, List<Achievement>> achievements;
 
-  private AchievementGenerator() {
+  public AchievementGenerator() {
     init();
-  }
-
-  public static AchievementGenerator getInstance() {
-    if (instance == null) {
-      instance = new AchievementGenerator();
-    }
-    return instance;
   }
 
   private void init() {
@@ -177,6 +168,7 @@ public class AchievementGenerator {
         new Achievement("Unlocked all difficulty 4 Ancient warrior artifacts",
             "Find all dificulty 4 Ancient warrior artifacts", new CheckArtifacts(4, "Ancient warrior"), false);
     warriorAchievements.add(warrior);
+    achievements.put("Ancient Warrior", warriorAchievements);
 
   }
 

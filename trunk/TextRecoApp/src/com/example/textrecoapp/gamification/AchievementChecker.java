@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.textrecoapp.App;
 import com.example.textrecoapp.achievements.Achievement;
 import com.example.textrecoapp.gameplay.MissionContext;
 
@@ -18,11 +19,12 @@ public class AchievementChecker {
   public List<Achievement> checkAchievements(MissionContext mission) {
     List<Achievement> freshlyUnlockedAchievements = new ArrayList<Achievement>();
 
-    for (Map.Entry<String, List<Achievement>> entry : AchievementGenerator.getInstance().getAchievements().entrySet()) {
+    for (Map.Entry<String, List<Achievement>> entry : App.getInstance().getAchievements().entrySet()) {
 
       for (Achievement achievement : entry.getValue()) {
 
-        //FIXME implement logic for continuous missions (comparison with entered mission and achievement criteria)
+        // FIXME implement logic for continuous missions (comparison with entered mission and
+        // achievement criteria)
         if (achievement.isContinuous()) {
           continue;
         }
