@@ -96,8 +96,8 @@ public class AchievementsActivity extends Activity {
     List<Object> objects = new ArrayList<Object>();
     int lonegstListSize = getLongestListSize(collection);
 
+    for (int i = 0; i < lonegstListSize; i++) {
     for (List<Achievement> list : collection) {
-      for (int i = 0; i < lonegstListSize; i++) {
         try {
           objects.add(list.get(i));
         } catch (IndexOutOfBoundsException e) {
