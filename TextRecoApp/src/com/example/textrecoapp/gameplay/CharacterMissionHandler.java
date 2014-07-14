@@ -6,6 +6,8 @@
  */
 package com.example.textrecoapp.gameplay;
 
+import java.util.List;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,12 +20,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.textrecoapp.App;
 import com.example.textrecoapp.CharacterSelectorActivity;
 import com.example.textrecoapp.OCRActivity;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.UiUtils;
+import com.example.textrecoapp.achievements.Achievement;
+import com.example.textrecoapp.achievements.AchievementsActivity;
 import com.example.textrecoapp.characters.Character;
 
 public class CharacterMissionHandler {
@@ -106,15 +109,8 @@ public class CharacterMissionHandler {
           }
         };
 
-        DialogInterface.OnClickListener negListener = new DialogInterface.OnClickListener() {
-
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            dialog.dismiss();
-          }
-        };
-
-        UiUtils.createSimpleDialog(context, title, message, posBtnText, negBtnText, posListener, negListener).show();
+        UiUtils.createSimpleDialog(context, title, message, posBtnText, negBtnText, posListener,
+            UiUtils.getNegListener()).show();
 
       }
     }
@@ -125,9 +121,8 @@ public class CharacterMissionHandler {
     @Override
     public void run() {
       Character character = App.getInstance().getCharacterManager().getCharacter();
-      MissionContext mission =
-          MissionGenerator.getInstance().generateMissionForCharacter(context, character.getCategory(),
-              userSelectedDifficulty);
+      MissionContext mission = MissionGenerator.getInstance().generateMissionForCharacter(context,
+          character.getCategory(), userSelectedDifficulty);
       character.setMission(mission);
     }
   };
@@ -214,6 +209,7 @@ public class CharacterMissionHandler {
     }
   }
 
+  @SuppressLint("InflateParams")
   private void populateDifficultyLevels(String category, int latestUnlocked) {
 
     difficultyContainer.removeAllViews();
@@ -265,17 +261,48 @@ public class CharacterMissionHandler {
 
       case MissionContext.MISSION_COMPLETE:
         Toast.makeText(context, "Mission finished", Toast.LENGTH_SHORT).show();
+
+        List<Achievement> unlockedAchievements = App.getInstance()
+            .getAchievementChecker()
+            .checkAchievements(character.getMission());
+
+        showUnlockedAchievements(unlockedAchievements);
+
         // remove the mission
         character.setMission(null);
 
         // update unlocked level
         App.getInstance().getCharacterManager().getCharacter().unlockNewLevel();
-
-        // TODO: check achievements
-
         break;
     }
     updatePanels();
+  }
+
+  private void showUnlockedAchievements(List<Achievement> unlockedAchievements) {
+    if (unlockedAchievements.size() == 0) {
+      return;
+    }
+    CharSequence[] achievements = new CharSequence[unlockedAchievements.size()];
+    int index = 0;
+    for (Achievement a : unlockedAchievements) {
+      achievements[index++] = a.getName();
+    }
+
+    String title = "New unlocked achievements";
+    String posBtnText = "GoTo Achievements";
+    String negBtnText = "Cancel";
+
+    DialogInterface.OnClickListener posListener = new DialogInterface.OnClickListener() {
+
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        Intent intent = new Intent(context, AchievementsActivity.class);
+        context.startActivity(intent);
+      }
+    };
+
+    UiUtils.createDialogWithList(context, title, achievements, posBtnText, negBtnText, posListener,
+        UiUtils.getNegListener()).show();;
   }
 
 }

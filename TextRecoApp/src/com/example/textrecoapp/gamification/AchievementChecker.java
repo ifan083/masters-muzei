@@ -8,7 +8,6 @@ package com.example.textrecoapp.gamification;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.example.textrecoapp.App;
 import com.example.textrecoapp.achievements.Achievement;
@@ -19,11 +18,11 @@ public class AchievementChecker {
   public List<Achievement> checkAchievements(MissionContext mission) {
     List<Achievement> freshlyUnlockedAchievements = new ArrayList<Achievement>();
 
-    for (Map.Entry<String, List<Achievement>> entry : App.getInstance().getAchievements().entrySet()) {
+    for (List<Achievement> list : App.getInstance().getAchievements().values()) {
+      for (Achievement achievement : list) {
 
-      for (Achievement achievement : entry.getValue()) {
-
-        // FIXME implement logic for continuous missions (comparison with entered mission and
+        // FIXME implement logic for continuous missions (comparison with
+        // entered mission and
         // achievement criteria)
         if (achievement.isContinuous()) {
           continue;
@@ -34,10 +33,9 @@ public class AchievementChecker {
         if (achievement.isUnlocked() && !previouslyUnlocked) {
           freshlyUnlockedAchievements.add(achievement);
         }
-
       }
-    }
 
+    }
     return freshlyUnlockedAchievements;
   }
 }

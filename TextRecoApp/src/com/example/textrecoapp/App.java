@@ -84,6 +84,8 @@ public class App extends Application {
       AchievementGenerator achievementGenerator = new AchievementGenerator();
       achievements = achievementGenerator.getAchievements();
     }
+    
+    achievementChecker = new AchievementChecker();
   }
 
   public TessBaseAPI getOCR_API() {
