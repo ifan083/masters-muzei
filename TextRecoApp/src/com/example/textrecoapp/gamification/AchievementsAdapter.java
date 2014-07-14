@@ -39,6 +39,8 @@ public class AchievementsAdapter extends ArrayAdapter<Object> {
 
       TextView tv = (TextView) view.findViewById(R.id.achievement_title);
       tv.setText(a.getName());
+
+      tv.getLayoutParams().height = tv.getLayoutParams().width;
     } else {
       view = inflater.inflate(R.layout.empty_achievement, null);
     }
