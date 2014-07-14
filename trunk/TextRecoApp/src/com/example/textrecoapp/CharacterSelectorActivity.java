@@ -183,7 +183,6 @@ public class CharacterSelectorActivity extends Activity {
       int result = data.getExtras().getInt(EXTRAS_MISSION_STATUS);
       Artifact artifact = (Artifact) data.getExtras().get(EXTRAS_MISSION_ARTIFACT);
       resolveScanResult(result, artifact);
-      missionHandler.handleResultFromOCR(result);
     }
   }
 

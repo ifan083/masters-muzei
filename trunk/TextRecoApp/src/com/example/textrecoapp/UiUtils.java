@@ -9,6 +9,7 @@ package com.example.textrecoapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -21,6 +22,8 @@ public final class UiUtils {
   private static final String RES_PREFIX = "muzei_";
   private static final String RES_HIGHLIGHTED = "_highlighted";
   private static final String RES_TYPE_DRAWABLE = "drawable";
+
+  private static DialogInterface.OnClickListener negListener;
 
   public static AlertDialog createDialogWithImageView(Context context,
       String title,
@@ -35,6 +38,23 @@ public final class UiUtils {
         .setView(customView)
         .setPositiveButton(posBtnText, posListener)
         .setNegativeButton(negBtnText, negListener);
+    return builder.create();
+  }
+
+  public static AlertDialog createDialogWithList(Context context,
+      String title,
+      CharSequence[] listOfAchievements,
+      String posBtnText,
+      String negBtnText,
+      DialogInterface.OnClickListener posListener,
+      DialogInterface.OnClickListener negListener) {
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    builder.setTitle(title)
+        .setItems(listOfAchievements, null)
+        .setPositiveButton(posBtnText, negListener)
+        .setNegativeButton(negBtnText, negListener);
+
     return builder.create();
   }
 
@@ -86,5 +106,19 @@ public final class UiUtils {
     circlePaint.setAlpha(128);
 
     canvas.drawCircle(center.x, center.y, radius, circlePaint);
+  }
+
+  public static DialogInterface.OnClickListener getNegListener() {
+    if (negListener == null) {
+      negListener = new OnClickListener() {
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          dialog.dismiss();
+        }
+      };
+    }
+    
+    return negListener;
   }
 }

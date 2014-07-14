@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -23,7 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
-
 import com.example.textrecoapp.App;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.gamification.AchievementsAdapter;
@@ -33,6 +32,7 @@ public class AchievementsActivity extends Activity {
   private Map<String, List<Achievement>> achievements;
   private GridView gridView;
   private LinearLayout headersContainer;
+  private AchievementsAdapter adapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +43,15 @@ public class AchievementsActivity extends Activity {
     gridView = (GridView) findViewById(R.id.grid_view);
 
     achievements = App.getInstance().getAchievements();
+    int numColumns = achievements.size();
     loadHeaders(achievements.keySet());
-    gridView.setNumColumns(achievements.size());
+    gridView.setNumColumns(numColumns);
     loadAchievements(achievements.values());
+    adapter.setNumColumnsAndCalculateHeight(numColumns);
 
     gridView.setOnItemClickListener(gridListener);
+
+    // FIXME: make implementation for unlocked / locked achievements
   }
 
   private OnItemClickListener gridListener = new OnItemClickListener() {
@@ -62,9 +66,10 @@ public class AchievementsActivity extends Activity {
     }
   };
 
+  @SuppressLint("InflateParams")
   private void loadHeaders(Set<String> headers) {
     int headersNum = headers.size();
-    int margin = getResources().getDimensionPixelOffset(R.dimen.grid_margin);
+    int margin = getResources().getDimensionPixelOffset(R.dimen.grid_margin_horizontal);
     int rightMargin = getResources().getDimensionPixelOffset(R.dimen.column_spacing);
     DisplayMetrics metrics = getResources().getDisplayMetrics();
 
@@ -97,7 +102,7 @@ public class AchievementsActivity extends Activity {
     int lonegstListSize = getLongestListSize(collection);
 
     for (int i = 0; i < lonegstListSize; i++) {
-    for (List<Achievement> list : collection) {
+      for (List<Achievement> list : collection) {
         try {
           objects.add(list.get(i));
         } catch (IndexOutOfBoundsException e) {
@@ -106,7 +111,7 @@ public class AchievementsActivity extends Activity {
       }
     }
 
-    AchievementsAdapter adapter = new AchievementsAdapter(this, 0, objects);
+    adapter = new AchievementsAdapter(this, 0, objects);
     gridView.setAdapter(adapter);
   }
 
