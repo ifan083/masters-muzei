@@ -16,6 +16,8 @@ import com.example.textrecoapp.gameplay.MissionContext;
  */
 public class Character implements Serializable {
 
+  private static final long serialVersionUID = 2100891000937263976L;
+  
   public static final int KNOWLEDGE_BASIC = 1;
   public static final int KNOWLEDGE_INTERMEDIATE = 2;
   public static final int KNOWLEDGE_SUPERIOR = 3;
@@ -70,7 +72,7 @@ public class Character implements Serializable {
   }
 
   public void unlockNewLevel() {
-    int total = App.getInstance().getCartographer().getTotalLevelsForCategory(name);
+    int total = App.getInstance().getCartographer().getTotalLevelsForCategory(category);
     if (total > latestUnlockedLevel) {
       latestUnlockedLevel++;
     }

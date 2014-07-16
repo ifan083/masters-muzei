@@ -11,6 +11,8 @@ import java.util.List;
 
 public class MissionContext implements Serializable {
 
+  private static final long serialVersionUID = -7641306858667745284L;
+  
   public static final int STAGE_FAILED = 0;
   public static final int STAGE_PASSED = 1;
   public static final int MISSION_COMPLETE = 2;

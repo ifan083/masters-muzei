@@ -13,6 +13,7 @@ package com.example.textrecoapp.map;
  * stipulated in the agreement/contract under which the program(s) have been supplied.
  */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -85,6 +86,7 @@ public class ScrollableZoomableImageView extends ImageView {
     sharedConstructing(context);
   }
 
+  @SuppressLint("ClickableViewAccessibility")
   private void sharedConstructing(Context context) {
     super.setClickable(true);
     mScaleDetector = new ScaleGestureDetector(context, new ScaleListener());
@@ -297,7 +299,7 @@ public class ScrollableZoomableImageView extends ImageView {
    * 
    * @param canvas the view's canvas object
    */
-  protected void drawPins(@SuppressWarnings("unused") Canvas canvas) {
+  protected void drawPins(Canvas canvas) {
     // empty on purpose
   }
 
@@ -309,7 +311,7 @@ public class ScrollableZoomableImageView extends ImageView {
    * @param x the x-coordinate of the click event
    * @param y the y-coordinate of the click event
    */
-  protected void handleClickEvent(@SuppressWarnings("unused") int x, @SuppressWarnings("unused") int y) {
+  protected void handleClickEvent(int x, int y) {
     // empty on purpose
   }
 

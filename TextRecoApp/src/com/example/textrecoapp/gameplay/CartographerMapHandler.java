@@ -65,11 +65,13 @@ public class CartographerMapHandler {
   }
 
   public void handleUnlockingArtifact(Artifact artifact) {
-    Toast.makeText(context, artifact.getName() + "is now unlocked", Toast.LENGTH_SHORT).show();
+    Toast.makeText(context, artifact.getName() + " " + context.getString(R.string.artifact_unlocked),
+        Toast.LENGTH_SHORT).show();
 
-    // show dialog?
+    mapView.changeFloor(artifact.getFloorId());
     mapView.updatePinBitmaps();
     mapView.invalidate();
+
     Pin preparedPin = new Pin(artifact);
     mapView.markAndCenterPin(preparedPin);
   }
@@ -84,7 +86,7 @@ public class CartographerMapHandler {
     Pin preparedPin = new Pin(artifact);
     mapView.markAndCenterPin(preparedPin);
 
-    Toast.makeText(context, "The desired artifact is somewhere in the red area", Toast.LENGTH_SHORT).show();
+    Toast.makeText(context, context.getString(R.string.wrong_artifact_scanned), Toast.LENGTH_SHORT).show();
 
     Artifact targetArtifact = App.getInstance().getCharacterManager().getCharacter().getMission().getArtifact();
     HelperCircle helperCircle = calculateHelperCircle(artifact, targetArtifact);

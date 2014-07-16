@@ -9,11 +9,20 @@
  */
 package com.example.textrecoapp.gamification;
 
+import java.io.Serializable;
+
 import com.example.textrecoapp.gameplay.MissionContext;
 
 
-public interface AchievementCriteria {
+public abstract class AchievementCriteria implements Serializable {
   
-  boolean checkAchievement(MissionContext mission);
+  
+  public AchievementCriteria() {
+  }
+  
+  private static final long serialVersionUID = -5419844084770354108L;
 
+  public boolean checkCriteria(MissionContext mission) {
+    return false;
+  };
 }

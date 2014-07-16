@@ -12,6 +12,8 @@ import com.example.textrecoapp.map.Location;
 
 public class Artifact implements Serializable {
 
+  private static final long serialVersionUID = -6900284088124587353L;
+  
   private String name;
   private String description;
   private String pictureFilename;

@@ -21,18 +21,20 @@ public class AchievementChecker {
     for (List<Achievement> list : App.getInstance().getAchievements().values()) {
       for (Achievement achievement : list) {
 
-        // FIXME implement logic for continuous missions (comparison with
-        // entered mission and
-        // achievement criteria)
         if (achievement.isContinuous()) {
-          continue;
+          int timesBeforeCheck = achievement.getTimes();
+          achievement.checkAchievement(mission);
+          if (achievement.getTimes() > timesBeforeCheck) {
+            freshlyUnlockedAchievements.add(achievement);
+          }
+        } else {
+          boolean previouslyUnlocked = achievement.isUnlocked();
+          achievement.checkAchievement(mission);
+          if (achievement.isUnlocked() && !previouslyUnlocked) {
+            freshlyUnlockedAchievements.add(achievement);
+          }
         }
 
-        boolean previouslyUnlocked = achievement.isUnlocked();
-        achievement.checkAchievement(mission);
-        if (achievement.isUnlocked() && !previouslyUnlocked) {
-          freshlyUnlockedAchievements.add(achievement);
-        }
       }
 
     }

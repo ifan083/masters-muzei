@@ -14,6 +14,8 @@ import com.example.textrecoapp.gameplay.Artifact;
 
 public class Pin implements Serializable {
 
+  private static final long serialVersionUID = 6487672438654082634L;
+  
   private Artifact artifact;
   private Bitmap bitmap;
   
