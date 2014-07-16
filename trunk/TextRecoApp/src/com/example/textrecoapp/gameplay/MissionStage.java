@@ -13,6 +13,8 @@ import java.util.Random;
 
 public class MissionStage implements Serializable {
 
+  private static final long serialVersionUID = -176678885870997841L;
+  
   private Artifact artifact;
   private Random randomGenerator;
 

@@ -128,7 +128,7 @@ public class CharacterSelectorActivity extends Activity {
     cartographerImageView = new ImageView(this);
     cartographerImageView.setLayoutParams(params);
     cartographerImageView.setTag(Cartographer.CARTOGRAPHER);
-    cartographerImageView.setImageDrawable(UiUtils.getStateDrawableForId(this, "cartographer", false));
+    cartographerImageView.setImageDrawable(UiUtils.getStateDrawableForId(this, Cartographer.CARTOGRAPHER, false));
     cartographerImageView.setOnClickListener(characterClickListener);
     characterContainer.addView(cartographerImageView);
 

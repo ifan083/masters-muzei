@@ -92,7 +92,6 @@ public class CharacterMissionHandler {
         }
 
         missionGenerator.run();
-        // update right panel
         updatePanels();
       } else {
 
@@ -251,16 +250,16 @@ public class CharacterMissionHandler {
     Character character = App.getInstance().getCharacterManager().getCharacter();
     switch (result) {
       case MissionContext.STAGE_PASSED:
-        Toast.makeText(context, "Mission Stage Passed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.mission_stage_passed), Toast.LENGTH_SHORT).show();
         break;
 
       case MissionContext.STAGE_FAILED:
         // do nothing
-        Toast.makeText(context, "Mission Stage Failed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.mission_stage_failed), Toast.LENGTH_SHORT).show();
         break;
 
       case MissionContext.MISSION_COMPLETE:
-        Toast.makeText(context, "Mission finished", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.mission_finished), Toast.LENGTH_SHORT).show();
 
         List<Achievement> unlockedAchievements = App.getInstance()
             .getAchievementChecker()
@@ -268,11 +267,10 @@ public class CharacterMissionHandler {
 
         showUnlockedAchievements(unlockedAchievements);
 
+        // update unlocked level
+        character.unlockNewLevel();
         // remove the mission
         character.setMission(null);
-
-        // update unlocked level
-        App.getInstance().getCharacterManager().getCharacter().unlockNewLevel();
         break;
     }
     updatePanels();
@@ -288,11 +286,11 @@ public class CharacterMissionHandler {
       achievements[index++] = a.getName();
     }
 
-    String title = "New unlocked achievements";
-    String posBtnText = "GoTo Achievements";
-    String negBtnText = "Cancel";
+    String title = context.getString(R.string.title_unlocked_dialog);
+    String posBtnText = context.getString(R.string.goto_achievements);
+    String negBtnText = context.getString(R.string.cancel);
 
-    DialogInterface.OnClickListener posListener = new DialogInterface.OnClickListener() {
+    DialogInterface.OnClickListener positiveListener = new DialogInterface.OnClickListener() {
 
       @Override
       public void onClick(DialogInterface dialog, int which) {
@@ -301,7 +299,7 @@ public class CharacterMissionHandler {
       }
     };
 
-    UiUtils.createDialogWithList(context, title, achievements, posBtnText, negBtnText, posListener,
+    UiUtils.createDialogWithList(context, title, achievements, posBtnText, negBtnText, positiveListener,
         UiUtils.getNegListener()).show();;
   }
 

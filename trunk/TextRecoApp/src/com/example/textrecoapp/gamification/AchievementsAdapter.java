@@ -7,15 +7,19 @@
 package com.example.textrecoapp.gamification;
 
 import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.achievements.Achievement;
 
@@ -38,7 +42,6 @@ public class AchievementsAdapter extends ArrayAdapter<Object> {
     columnWidth /= numColumns;
   }
 
-
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -49,18 +52,37 @@ public class AchievementsAdapter extends ArrayAdapter<Object> {
       view = LayoutInflater.from(getContext()).inflate(R.layout.achievement, null);
     }
 
-    TextView tv = (TextView) view.findViewById(R.id.achievement_title);
+    TextView tv = (TextView) view.findViewById(R.id.achievement_label);
     tv.getLayoutParams().height = columnWidth;
+    
+    ImageView iv = (ImageView) view.findViewById(R.id.lock_img);
 
     if (obj instanceof Achievement) {
       Achievement a = (Achievement) obj;
       tv.setText(a.getName());
-      tv.setTextColor(Color.WHITE);
       tv.setBackgroundColor(Color.BLUE);
+      view.setEnabled(true);
+      tv.setTextColor(Color.WHITE);
+      tv.setTypeface(null, Typeface.BOLD);
+
+      if (a.isContinuous() && a.getTimes() > 0) {
+        // unlocked
+        tv.setText(tv.getText() + " x" + a.getTimes());
+        iv.setVisibility(View.INVISIBLE);
+      } else if (a.isUnlocked()) {
+        iv.setVisibility(View.INVISIBLE);
+      } else {
+        iv.setVisibility(View.VISIBLE);
+        tv.setTextColor(Color.GRAY);
+        tv.setTypeface(null, Typeface.NORMAL);
+      }
+
+
     } else {
-      tv.setText("/");
-      tv.setTextColor(Color.BLACK);
+      iv.setVisibility(View.INVISIBLE);
+      tv.setText("");
       tv.setBackgroundColor(Color.GRAY);
+      view.setEnabled(false);
     }
 
     return view;

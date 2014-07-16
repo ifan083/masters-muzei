@@ -11,8 +11,10 @@ import com.example.textrecoapp.gameplay.Artifact;
 import com.example.textrecoapp.gameplay.MissionContext;
 import com.example.textrecoapp.gamification.AchievementCriteria;
 
-public class CheckArtifacts implements AchievementCriteria {
+public class CheckArtifacts extends AchievementCriteria {
 
+  private static final long serialVersionUID = -611583510219673907L;
+  
   private int difficulty;
   private String category;
 
@@ -22,7 +24,7 @@ public class CheckArtifacts implements AchievementCriteria {
   }
 
   @Override
-  public boolean checkAchievement(MissionContext mission) {
+  public boolean checkCriteria(MissionContext mission) {
 
     if (category == null) {
       return checkArtifactsByRank();

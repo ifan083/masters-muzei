@@ -22,7 +22,9 @@ import android.util.Log;
 import com.example.textrecoapp.achievements.Achievement;
 import com.example.textrecoapp.characters.Character;
 import com.example.textrecoapp.gameplay.Artifact;
+import com.example.textrecoapp.gamification.AchievementCriteria;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 public class GSONPersister {
@@ -37,7 +39,10 @@ public class GSONPersister {
   private Gson gson;
 
   public GSONPersister() {
-    gson = new Gson();
+    GsonBuilder gsonBilder = new GsonBuilder();
+    gsonBilder.registerTypeAdapter(AchievementCriteria.class, new CriteriaSerializerDeserializer());
+    gson = gsonBilder.create();
+
     File folder = new File(Environment.getExternalStorageDirectory() + FOLDER);
     if (!folder.exists()) {
       folder.mkdir();

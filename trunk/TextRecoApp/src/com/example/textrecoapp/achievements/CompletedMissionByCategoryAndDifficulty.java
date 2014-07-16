@@ -9,8 +9,10 @@ package com.example.textrecoapp.achievements;
 import com.example.textrecoapp.gameplay.MissionContext;
 import com.example.textrecoapp.gamification.AchievementCriteria;
 
-public class CompletedMissionByCategoryAndDifficulty implements AchievementCriteria {
+public class CompletedMissionByCategoryAndDifficulty extends AchievementCriteria {
 
+  private static final long serialVersionUID = 6830171716753456650L;
+  
   private String category;
   private int difficulty;
 
@@ -20,7 +22,7 @@ public class CompletedMissionByCategoryAndDifficulty implements AchievementCrite
   }
 
   @Override
-  public boolean checkAchievement(MissionContext mission) {
+  public boolean checkCriteria(MissionContext mission) {
     return mission.getArtifact().getCategory().equals(category) && mission.getDifficulty() == difficulty;
   }
 

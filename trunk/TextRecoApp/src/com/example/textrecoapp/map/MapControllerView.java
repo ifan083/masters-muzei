@@ -181,7 +181,7 @@ public class MapControllerView extends ScrollableZoomableImageView {
       }, 300);
     }
   }
-
+  
   /**
    * Dispatches touch event to the map view which corrects bad drawings caused by matrix
    * transitions.

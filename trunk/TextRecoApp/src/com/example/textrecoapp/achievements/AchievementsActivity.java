@@ -50,8 +50,6 @@ public class AchievementsActivity extends Activity {
     adapter.setNumColumnsAndCalculateHeight(numColumns);
 
     gridView.setOnItemClickListener(gridListener);
-
-    // FIXME: make implementation for unlocked / locked achievements
   }
 
   private OnItemClickListener gridListener = new OnItemClickListener() {

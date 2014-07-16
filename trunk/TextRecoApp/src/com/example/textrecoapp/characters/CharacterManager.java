@@ -13,7 +13,7 @@ import java.util.Map;
 public class CharacterManager {
 
   private Map<String, Character> characters;
-  private Character currentCharacter;
+  private String characterName;
 
   public CharacterManager(List<Character> chars) {
     characters = new HashMap<String, Character>();
@@ -23,10 +23,10 @@ public class CharacterManager {
   }
   
   public void changeCharacter(String name) {
-    currentCharacter = characters.get(name);
+    this.characterName = name;
   }
 
   public Character getCharacter() {
-    return currentCharacter;
+    return characters.get(characterName);
   }
 }

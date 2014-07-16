@@ -13,10 +13,12 @@ import com.example.textrecoapp.gameplay.MissionContext;
 import com.example.textrecoapp.gamification.AchievementCriteria;
 
 
-public class FirstMissionEver implements AchievementCriteria {
+public class FirstMissionEver extends AchievementCriteria {
+
+  private static final long serialVersionUID = 8342637163187393474L;
 
   @Override
-  public boolean checkAchievement(MissionContext mission) {
+  public boolean checkCriteria(MissionContext mission) {
     return true;
   }
 

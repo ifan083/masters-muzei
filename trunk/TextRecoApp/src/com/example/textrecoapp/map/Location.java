@@ -14,6 +14,8 @@ import java.io.Serializable;
 
 public class Location implements Serializable {
 
+  private static final long serialVersionUID = 6848020802129922522L;
+  
   private float xPercentage;
   private float yPercentage;
   private String floorId;

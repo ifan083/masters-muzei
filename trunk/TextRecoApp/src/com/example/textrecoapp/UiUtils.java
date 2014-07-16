@@ -52,7 +52,7 @@ public final class UiUtils {
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(title)
         .setItems(listOfAchievements, null)
-        .setPositiveButton(posBtnText, negListener)
+        .setPositiveButton(posBtnText, posListener)
         .setNegativeButton(negBtnText, negListener);
 
     return builder.create();
@@ -67,8 +67,10 @@ public final class UiUtils {
       DialogInterface.OnClickListener negListener) {
 
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setTitle(title).setMessage(message).setPositiveButton(posBtnText, posListener);
-    builder.setNegativeButton(negBtnText, negListener);
+    builder.setTitle(title)
+        .setMessage(message)
+        .setPositiveButton(posBtnText, posListener)
+        .setNegativeButton(negBtnText, negListener);
 
     return builder.create();
   }
@@ -118,7 +120,7 @@ public final class UiUtils {
         }
       };
     }
-    
+
     return negListener;
   }
 }

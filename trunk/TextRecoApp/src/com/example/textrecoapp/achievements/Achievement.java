@@ -6,11 +6,15 @@
  */
 package com.example.textrecoapp.achievements;
 
+import java.io.Serializable;
+
 import com.example.textrecoapp.gameplay.MissionContext;
 import com.example.textrecoapp.gamification.AchievementCriteria;
 
-public class Achievement {
+public class Achievement implements Serializable {
 
+  private static final long serialVersionUID = 5948239323797798106L;
+  
   private String name;
   private String description;
   private AchievementCriteria criteria;
@@ -25,7 +29,7 @@ public class Achievement {
     this.criteria = criteria;
     this.continuous = continuous;
 
-    times = 1;
+    times = 0;
   }
 
   public String getName() {
@@ -38,7 +42,7 @@ public class Achievement {
 
   public void checkAchievement(MissionContext mission) {
     if (continuous) {
-      if (criteria.checkAchievement(mission)) {
+      if (criteria.checkCriteria(mission)) {
         times++;
       }
       return;
@@ -48,7 +52,7 @@ public class Achievement {
       return;
     }
 
-    unlocked = criteria.checkAchievement(mission);
+    unlocked = criteria.checkCriteria(mission);
   }
 
   public boolean isUnlocked() {

@@ -10,7 +10,9 @@
     <string name="submit">Submit</string>
     <string name="title_scan_dialog">Result from scanning</string>
     <string name="scanned_text">Scanned text:</string>
-    <string name="cancel">Cancel</string>        
+    <string name="cancel">Cancel</string>       
+    <string name="goto_achievements">Go To Achievements</string>
+    <string name="title_unlocked_dialog">New unlocked achievements</string> 
     
 
     <!-- Missions -->
@@ -22,6 +24,9 @@
     <string name="dialog_mission_title">Mission in progress</string>
     <string name="dialog_mission_message">If you start new game all mission progress will be lost</string>
     <string name="select_dificulty">First select mission difficulty</string>
+    <string name="mission_stage_passed">Mission Stage Passed</string>
+    <string name="mission_stage_failed">Mission Stage Failed</string>
+    <string name="mission_finished">Mission Finished</string>
 
     <!-- Panels -->
     <string name="mission_progress">Mission progress: </string>
@@ -32,4 +37,7 @@
     <string name="how_to_start_mission">Select a difficulty and click on \'Start new mission\'</string>
     <string name="next_hint">Next Hint</string>
 
+    <!-- Map -->
+    <string name="wrong_artifact_scanned">The desired artifact is somewhere in the red area</string>
+    <string name="artifact_unlocked"> is now unlocked</string>
 </resources>
