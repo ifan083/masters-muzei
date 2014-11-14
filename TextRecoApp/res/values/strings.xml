@@ -10,10 +10,9 @@
     <string name="submit">Submit</string>
     <string name="title_scan_dialog">Result from scanning</string>
     <string name="scanned_text">Scanned text:</string>
-    <string name="cancel">Cancel</string>       
+    <string name="cancel">Cancel</string>
     <string name="goto_achievements">Go To Achievements</string>
-    <string name="title_unlocked_dialog">New unlocked achievements</string> 
-    
+    <string name="title_unlocked_dialog">New unlocked achievements</string>
 
     <!-- Missions -->
     <string name="mission_description_template">Gain %1$s knowledge in %2$s history.</string>
@@ -27,17 +26,33 @@
     <string name="mission_stage_passed">Mission Stage Passed</string>
     <string name="mission_stage_failed">Mission Stage Failed</string>
     <string name="mission_finished">Mission Finished</string>
+    <string name="mission_new">New mission</string>
+    <string name="select_mission">Select Mission</string>
+    <string name="select">Select</string>
 
     <!-- Panels -->
     <string name="mission_progress">Mission progress: </string>
     <string name="find_artifact">Find artifact</string>
-    <string name="start_new_mission">Start new mission</string>
+    <string name="ranked_mission">Ranked mission</string>
     <string name="character_description_template">Hi! I am an admirer of \"%1$s\" historical period and I will be your recruiter today.</string>
-    <string name="no_mission_in_progress">No mission in progress</string>
+    <string name="no_mission_in_progress">No ranked mission in progress</string>
     <string name="how_to_start_mission">Select a difficulty and click on \'Start new mission\'</string>
     <string name="next_hint">Next Hint</string>
+    <string name="story_mission">Story Mission</string>
+    <string name="ranked_missions">Ranked Missions</string>
+    <string name="story_missions">Story Missions</string>
 
     <!-- Map -->
     <string name="wrong_artifact_scanned">The desired artifact is somewhere in the red area</string>
     <string name="artifact_unlocked"> is now unlocked</string>
+
+    <!-- Story -->
+    <string name="story_intro">Story Introduction</string>
+    <string name="final_congratulations">Congratulations!!!</string>
+    <string name="final_followup">You\'ve finished the story and found all artifacts</string>
+    <string name="final_button">Start this story again</string>
+    <string name="final_note">NOTE: If you press the button, all the progress from the story will be deleted.</string>
+    <string name="step_solved">Solved!!! proceed to next step</string>
+    <string name="step_message">Can you guess the artifact?</string>
+
 </resources>

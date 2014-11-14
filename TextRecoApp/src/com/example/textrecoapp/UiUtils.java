@@ -19,108 +19,123 @@ import android.view.View;
 
 public final class UiUtils {
 
-  private static final String RES_PREFIX = "muzei_";
-  private static final String RES_HIGHLIGHTED = "_highlighted";
-  private static final String RES_TYPE_DRAWABLE = "drawable";
+	private static final String RES_PREFIX = "muzei_";
+	private static final String RES_HIGHLIGHTED = "_highlighted";
+	private static final String RES_TYPE_DRAWABLE = "drawable";
 
-  private static DialogInterface.OnClickListener negListener;
+	private static DialogInterface.OnClickListener negListener;
 
-  public static AlertDialog createDialogWithImageView(Context context,
-      String title,
-      String posBtnText,
-      String negBtnText,
-      View customView,
-      DialogInterface.OnClickListener posListener,
-      DialogInterface.OnClickListener negListener) {
+	public static AlertDialog createDialogWithRadioButtonList(Context context,
+			String title, CharSequence[] items,
+			DialogInterface.OnClickListener itemsListener, String posBtntext,
+			DialogInterface.OnClickListener posListener) {
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setTitle(title)
-        .setView(customView)
-        .setPositiveButton(posBtnText, posListener)
-        .setNegativeButton(negBtnText, negListener);
-    return builder.create();
-  }
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title).setSingleChoiceItems(items, -1, itemsListener)
+				.setPositiveButton(posBtntext, posListener)
+				.setNegativeButton(R.string.cancel, negListener);
 
-  public static AlertDialog createDialogWithList(Context context,
-      String title,
-      CharSequence[] listOfAchievements,
-      String posBtnText,
-      String negBtnText,
-      DialogInterface.OnClickListener posListener,
-      DialogInterface.OnClickListener negListener) {
+		return builder.create();
+	}
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setTitle(title)
-        .setItems(listOfAchievements, null)
-        .setPositiveButton(posBtnText, posListener)
-        .setNegativeButton(negBtnText, negListener);
+	public static AlertDialog createDialogWithView(Context context,
+			String title, String posBtnText, String negBtnText,
+			View customView, DialogInterface.OnClickListener posListener,
+			DialogInterface.OnClickListener negListener) {
 
-    return builder.create();
-  }
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title).setView(customView)
+				.setPositiveButton(posBtnText, posListener)
+				.setNegativeButton(negBtnText, negListener);
+		return builder.create();
+	}
 
-  public static AlertDialog createSimpleDialog(Context context,
-      String title,
-      String message,
-      String posBtnText,
-      String negBtnText,
-      DialogInterface.OnClickListener posListener,
-      DialogInterface.OnClickListener negListener) {
+	public static AlertDialog createDialogWithList(Context context,
+			String title, CharSequence[] listOfAchievements, String posBtnText,
+			String negBtnText, DialogInterface.OnClickListener posListener,
+			DialogInterface.OnClickListener negListener) {
 
-    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-    builder.setTitle(title)
-        .setMessage(message)
-        .setPositiveButton(posBtnText, posListener)
-        .setNegativeButton(negBtnText, negListener);
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title).setItems(listOfAchievements, null)
+				.setPositiveButton(posBtnText, posListener)
+				.setNegativeButton(negBtnText, negListener);
 
-    return builder.create();
-  }
+		return builder.create();
+	}
 
-  public static StateListDrawable getStateDrawableForId(Context context, String id, boolean hasPrefix) {
-    String str_id_regular = (hasPrefix ? RES_PREFIX : "") + id;
-    String str_id_pressed = (hasPrefix ? RES_PREFIX : "") + id + RES_HIGHLIGHTED;
-    int id_normal = context.getResources().getIdentifier(str_id_regular, RES_TYPE_DRAWABLE, context.getPackageName());
-    int id_pressed = context.getResources().getIdentifier(str_id_pressed, RES_TYPE_DRAWABLE, context.getPackageName());
+	public static AlertDialog createSimpleDialog(Context context, String title,
+			String message, String posBtnText, String negBtnText,
+			DialogInterface.OnClickListener posListener,
+			DialogInterface.OnClickListener negListener) {
 
-    StateListDrawable stateList = new StateListDrawable();
-    stateList.addState(new int[]{android.R.attr.state_pressed}, context.getResources().getDrawable(id_pressed));
-    stateList.addState(new int[]{android.R.attr.state_enabled}, context.getResources().getDrawable(id_normal));
-    return stateList;
-  }
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title).setMessage(message)
+				.setPositiveButton(posBtnText, posListener)
+				.setNegativeButton(negBtnText, negListener);
 
-  public static int getImageDrawableId(Context context, String id) {
-    int drawableId = context.getResources().getIdentifier(id, RES_TYPE_DRAWABLE, context.getPackageName());
-    return drawableId;
-  }
+		return builder.create();
+	}
 
-  public static void drawHighlightedRectangle(Canvas canvas, Point point) {
-    Paint circlePaint = new Paint();
-    circlePaint.setStyle(Paint.Style.FILL);
-    circlePaint.setColor(Color.BLUE);
-    circlePaint.setAlpha(128);
+	public static AlertDialog createSimpleCancelDialog(Context context,
+			String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title).setMessage(message).setCancelable(true);
+		return builder.create();
+	}
 
-    canvas.drawCircle(point.x, point.y, 50, circlePaint);
-  }
+	public static StateListDrawable getStateDrawableForId(Context context,
+			String id, boolean hasPrefix) {
+		String str_id_regular = (hasPrefix ? RES_PREFIX : "") + id;
+		String str_id_pressed = (hasPrefix ? RES_PREFIX : "") + id
+				+ RES_HIGHLIGHTED;
+		int id_normal = context.getResources().getIdentifier(str_id_regular,
+				RES_TYPE_DRAWABLE, context.getPackageName());
+		int id_pressed = context.getResources().getIdentifier(str_id_pressed,
+				RES_TYPE_DRAWABLE, context.getPackageName());
 
-  public static void drawCircle(Canvas canvas, Point center, int radius) {
-    Paint circlePaint = new Paint();
-    circlePaint.setStyle(Paint.Style.FILL);
-    circlePaint.setColor(Color.RED);
-    circlePaint.setAlpha(128);
+		StateListDrawable stateList = new StateListDrawable();
+		stateList.addState(new int[] { android.R.attr.state_pressed }, context
+				.getResources().getDrawable(id_pressed));
+		stateList.addState(new int[] { android.R.attr.state_enabled }, context
+				.getResources().getDrawable(id_normal));
+		return stateList;
+	}
 
-    canvas.drawCircle(center.x, center.y, radius, circlePaint);
-  }
+	public static int getImageDrawableId(Context context, String id) {
+		int drawableId = context.getResources().getIdentifier(id,
+				RES_TYPE_DRAWABLE, context.getPackageName());
+		return drawableId;
+	}
 
-  public static DialogInterface.OnClickListener getNegListener() {
-    if (negListener == null) {
-      negListener = new OnClickListener() {
+	public static void drawHighlightedRectangle(Canvas canvas, Point point) {
+		Paint circlePaint = new Paint();
+		circlePaint.setStyle(Paint.Style.FILL);
+		circlePaint.setColor(Color.BLUE);
+		circlePaint.setAlpha(128);
 
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          dialog.dismiss();
-        }
-      };
-    }
+		canvas.drawCircle(point.x, point.y, 50, circlePaint);
+	}
 
-    return negListener;
-  }
+	public static void drawCircle(Canvas canvas, Point center, int radius) {
+		Paint circlePaint = new Paint();
+		circlePaint.setStyle(Paint.Style.FILL);
+		circlePaint.setColor(Color.RED);
+		circlePaint.setAlpha(128);
+
+		canvas.drawCircle(center.x, center.y, radius, circlePaint);
+	}
+
+	public static DialogInterface.OnClickListener getNegListener() {
+		if (negListener == null) {
+			negListener = new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			};
+		}
+
+		return negListener;
+	}
 }

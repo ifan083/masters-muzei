@@ -15,5 +15,9 @@
     <dimen name="row_spacing">6dp</dimen>
     <dimen name="grid_margin_horizontal">25dp</dimen>
     <dimen name="grid_padding_vertical">10dp</dimen>
+    
+    <!-- Story screen -->
+    <dimen name="progress_height">15dp</dimen>
+    <dimen name="progress_margin">5dp</dimen>
 
 </resources>

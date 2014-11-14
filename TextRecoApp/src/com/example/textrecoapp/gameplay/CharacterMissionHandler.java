@@ -7,300 +7,207 @@
 package com.example.textrecoapp.gameplay;
 
 import java.util.List;
-import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.textrecoapp.App;
-import com.example.textrecoapp.CharacterSelectorActivity;
-import com.example.textrecoapp.OCRActivity;
 import com.example.textrecoapp.R;
 import com.example.textrecoapp.UiUtils;
 import com.example.textrecoapp.achievements.Achievement;
 import com.example.textrecoapp.achievements.AchievementsActivity;
 import com.example.textrecoapp.characters.Character;
+import com.example.textrecoapp.data.StoryGenerator;
+import com.example.textrecoapp.models.StoryMission;
+import com.example.textrecoapp.story.StoryModeActivity;
+import com.example.textrecoapp.wizards.AbstractWizardActivity;
 
-public class CharacterMissionHandler {
+public class CharacterMissionHandler implements IMissionSelectionListener {
 
-  private Context context;
-  private LayoutInflater layoutInflater;
+	private Context context;
+	private LayoutInflater layoutInflater;
 
-  private int lockedDifficultyColor;
-  private int currentDifficultyColor;
-  private int unlockedDifficultyColor;
-  private int unselectedDificultyColor;
-  private int selectedDificultyColor;
+	// views
+	private TextView characterTitle;
+	private TextView characterDescription;
+	private ExpandableListView listView;
 
-  // views
-  private TextView characterTitle;
-  private TextView characterDescription;
-  private LinearLayout difficultyContainer;
-  private Button startNewMissionBtn;
-  private TextView missionTitle;
-  private TextView missionDescription;
-  private View missionProgressContainer;
-  private TextView missionProgress;
-  private Button findArtifactBtn;
+	private int userSelectedDifficulty;
+	private StoryGenerator storyGenerator;
+	private boolean isRankedSelected;
 
-  private int userSelectedDifficulty;
+	public CharacterMissionHandler(Context context) {
+		this.context = context;
+		layoutInflater = (LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		storyGenerator = new StoryGenerator();
+	}
 
-  public CharacterMissionHandler(Context context) {
-    this.context = context;
-    layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	public void handleMissionForCharacter(String characterName,
+			ViewGroup leftPanel, ViewGroup rightPanel) {
+		App.getInstance().getCharacterManager().changeCharacter(characterName);
+		userSelectedDifficulty = -1;
 
-    lockedDifficultyColor = android.R.color.darker_gray;
-    currentDifficultyColor = android.R.color.holo_green_dark;
-    unlockedDifficultyColor = android.R.color.holo_blue_dark;
-    selectedDificultyColor = android.R.color.holo_red_dark;
-    unselectedDificultyColor = android.R.color.transparent;
-  }
+		// inflate layouts
+		inflateLeftPanel(leftPanel);
+		inflateRightPanel(rightPanel);
 
-  public void handleMissionForCharacter(String characterName, ViewGroup leftPanel, ViewGroup rightPanel) {
-    App.getInstance().getCharacterManager().changeCharacter(characterName);
-    userSelectedDifficulty = -1;
+		updatePanels();
+	}
 
-    // inflate layouts
-    inflateLeftPanel(leftPanel);
-    inflateRightPanel(rightPanel);
+	private Runnable missionGenerator = new Runnable() {
 
-    updatePanels();
+		@Override
+		public void run() {
+			Character character = App.getInstance().getCharacterManager()
+					.getCharacter();
+			MissionContext mission = MissionGenerator.getInstance()
+					.generateMissionForCharacter(context,
+							character.getCategory(), userSelectedDifficulty);
+			character.setMission(mission);
+		}
+	};
 
-    startNewMissionBtn.setOnClickListener(startNewMissionListener);
-    findArtifactBtn.setOnClickListener(findArtefactListener);
-  }
+	private void updatePanels() {
+		Character character = App.getInstance().getCharacterManager()
+				.getCharacter();
 
-  private View.OnClickListener startNewMissionListener = new OnClickListener() {
+		// populate always known data
+		characterTitle.setText(character.getName());
+		String templateString = context.getResources().getString(
+				R.string.character_description_template);
+		String charDescription = String.format(templateString,
+				character.getCategory());
+		characterDescription.setText(charDescription);
+	}
 
-    @Override
-    public void onClick(View v) {
-      Character character = App.getInstance().getCharacterManager().getCharacter();
-      if (character.getMission() == null) {
-        // generate mission
+	private void inflateLeftPanel(ViewGroup leftPanel) {
+		if (characterTitle == null) {
+			View leftPanelContent = layoutInflater.inflate(
+					R.layout.left_panel_layout, leftPanel);
 
-        if (userSelectedDifficulty == -1) {
-          Toast.makeText(context, context.getString(R.string.select_dificulty), Toast.LENGTH_SHORT).show();
-          return;
-        }
+			characterTitle = (TextView) leftPanelContent
+					.findViewById(R.id.character_title);
+			characterDescription = (TextView) leftPanelContent
+					.findViewById(R.id.character_description);
+		}
+	}
 
-        missionGenerator.run();
-        updatePanels();
-      } else {
+	private void inflateRightPanel(ViewGroup rightPanel) {
+		if (listView == null) {
+			View rightPanelContent = layoutInflater.inflate(
+					R.layout.right_panel_layout, rightPanel);
+			listView = (ExpandableListView) rightPanelContent
+					.findViewById(R.id.exp_list);
+			MissionSelectorHandler listSelector = new MissionSelectorHandler(context);
+			listView.setAdapter(listSelector.getAdapter());
+			listView.setOnChildClickListener(listSelector.getChildClickListener());
+		}
+	}
 
-        String title = context.getString(R.string.dialog_mission_title);
-        String message = context.getString(R.string.dialog_mission_message);
-        String posBtnText = context.getString(R.string.start_new_mission);
-        String negBtnText = context.getString(R.string.cancel);
+	//TODO: move to ranked mission wizard
+	public void handleResultFromOCR(int result) {
+		Character character = App.getInstance().getCharacterManager()
+				.getCharacter();
+		switch (result) {
+		case MissionContext.STAGE_PASSED:
+			Toast.makeText(context,
+					context.getString(R.string.mission_stage_passed),
+					Toast.LENGTH_SHORT).show();
+			break;
 
-        DialogInterface.OnClickListener posListener = new DialogInterface.OnClickListener() {
+		case MissionContext.STAGE_FAILED:
+			// do nothing
+			Toast.makeText(context,
+					context.getString(R.string.mission_stage_failed),
+					Toast.LENGTH_SHORT).show();
+			break;
 
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            missionGenerator.run();
-          }
-        };
+		case MissionContext.MISSION_COMPLETE:
+			Toast.makeText(context,
+					context.getString(R.string.mission_finished),
+					Toast.LENGTH_SHORT).show();
 
-        UiUtils.createSimpleDialog(context, title, message, posBtnText, negBtnText, posListener,
-            UiUtils.getNegListener()).show();
+			List<Achievement> unlockedAchievements = App.getInstance()
+					.getAchievementChecker()
+					.checkAchievements(character.getMission());
 
-      }
-    }
-  };
+			showUnlockedAchievements(unlockedAchievements);
 
-  private Runnable missionGenerator = new Runnable() {
+			// update unlocked level
+			character.unlockNewLevel();
+			// remove the mission
+			character.setMission(null);
+			break;
+		}
+		updatePanels();
+	}
 
-    @Override
-    public void run() {
-      Character character = App.getInstance().getCharacterManager().getCharacter();
-      MissionContext mission = MissionGenerator.getInstance().generateMissionForCharacter(context,
-          character.getCategory(), userSelectedDifficulty);
-      character.setMission(mission);
-    }
-  };
+	private void showUnlockedAchievements(List<Achievement> unlockedAchievements) {
+		if (unlockedAchievements.size() == 0) {
+			return;
+		}
+		CharSequence[] achievements = new CharSequence[unlockedAchievements
+				.size()];
+		int index = 0;
+		for (Achievement a : unlockedAchievements) {
+			achievements[index++] = a.getName();
+		}
 
-  private void updatePanels() {
-    Character character = App.getInstance().getCharacterManager().getCharacter();
+		String title = context.getString(R.string.title_unlocked_dialog);
+		String posBtnText = context.getString(R.string.goto_achievements);
+		String negBtnText = context.getString(R.string.cancel);
 
-    // populate always known data
-    characterTitle.setText(character.getName());
-    String templateString = context.getResources().getString(R.string.character_description_template);
-    String charDescription = String.format(templateString, character.getCategory());
-    characterDescription.setText(charDescription);
+		DialogInterface.OnClickListener positiveListener = new DialogInterface.OnClickListener() {
 
-    populateDifficultyLevels(character.getCategory(), character.getLatestUnlockedLevel());
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Intent intent = new Intent(context, AchievementsActivity.class);
+				context.startActivity(intent);
+			}
+		};
 
-    // check idle vs. current mission behavior
-    if (character.getMission() == null) {
-      missionTitle.setText(context.getResources().getString(R.string.no_mission_in_progress));
-      missionDescription.setText("\"" + context.getResources().getString(R.string.how_to_start_mission) + "\"");
-      findArtifactBtn.setVisibility(View.GONE);
-      missionProgressContainer.setVisibility(View.GONE);
-    } else {
-      int missionDificulty = character.getMission().getDifficulty();
-      missionTitle.setText(character.getMission().getTitle());
-      missionDescription.setText(formatMissionDescription(missionDificulty));
+		UiUtils.createDialogWithList(context, title, achievements, posBtnText,
+				negBtnText, positiveListener, UiUtils.getNegListener()).show();
+		;
+	}
 
-      highlightCurrentMissionDifficulty(missionDificulty);
+	@Override
+	public void digestSelection(int result) {
+		if (isRankedSelected) {
+			userSelectedDifficulty = result;
+			missionGenerator.run();
+			updatePanels();
+		} else {
+			Character character = App.getInstance().getCharacterManager()
+					.getCharacter();
+			character.setStory(getStoryById(result));
 
-      // mission progress
-      missionProgress.setText(character.getMission().getMissionProgress());
-      findArtifactBtn.setVisibility(View.VISIBLE);
-      missionProgressContainer.setVisibility(View.VISIBLE);
-    }
-  }
+			Intent intent = new Intent(context, StoryModeActivity.class);
+			intent.putExtra(AbstractWizardActivity.EXTRAS_MISSION,
+					character.getStory());
+			context.startActivity(intent);
+		}
+	}
 
-  private String formatMissionDescription(int difficulty) {
-    Character character = App.getInstance().getCharacterManager().getCharacter();
-    String difficultyDescription = GameplayUtils.getDifficultyDescriptor(context, difficulty);
-    String templateString2 = context.getResources().getString(R.string.mission_description_template);
-    String formattedString = String.format(templateString2, difficultyDescription, character.getCategory());
-    return formattedString;
-  }
-
-  private View.OnClickListener findArtefactListener = new OnClickListener() {
-
-    @Override
-    public void onClick(View v) {
-      CharacterSelectorActivity activity = (CharacterSelectorActivity) context;
-
-      Intent intent = new Intent(context, OCRActivity.class);
-      activity.startActivityForResult(intent, CharacterSelectorActivity.REQ_CODE_OCR);
-    }
-  };
-
-  private void highlightCurrentMissionDifficulty(int missionDificulty) {
-    for (int i = 0; i < difficultyContainer.getChildCount(); i++) {
-      ViewGroup v = (ViewGroup) difficultyContainer.getChildAt(i);
-      TextView tv = (TextView) v.getChildAt(0);
-      if (Integer.parseInt(String.valueOf(tv.getText())) == missionDificulty) {
-        tv.setBackgroundResource(currentDifficultyColor);
-        break;
-      }
-    }
-  }
-
-  private void inflateLeftPanel(ViewGroup leftPanel) {
-    if (characterTitle == null) {
-      View leftPanelContent = layoutInflater.inflate(R.layout.left_panel_layout, leftPanel);
-      characterTitle = (TextView) leftPanelContent.findViewById(R.id.character_title);
-      characterDescription = (TextView) leftPanelContent.findViewById(R.id.character_description);
-      difficultyContainer = (LinearLayout) leftPanelContent.findViewById(R.id.difficulty_conatainer);
-      startNewMissionBtn = (Button) leftPanelContent.findViewById(R.id.start_newgame_btn);
-    }
-  }
-
-  private void inflateRightPanel(ViewGroup rightPanel) {
-    if (missionTitle == null) {
-      View rightPanelContent = layoutInflater.inflate(R.layout.right_panel_layout, rightPanel);
-      missionTitle = (TextView) rightPanelContent.findViewById(R.id.mission_title);
-      missionProgress = (TextView) rightPanelContent.findViewById(R.id.mission_progress);
-      missionProgressContainer = rightPanelContent.findViewById(R.id.mission_progress_container);
-      missionDescription = (TextView) rightPanelContent.findViewById(R.id.mission_description);
-      findArtifactBtn = (Button) rightPanelContent.findViewById(R.id.find_artifact_btn);
-    }
-  }
-
-  @SuppressLint("InflateParams")
-  private void populateDifficultyLevels(String category, int latestUnlocked) {
-
-    difficultyContainer.removeAllViews();
-
-    int totalLvls = App.getInstance().getCartographer().getTotalLevelsForCategory(category);
-
-    for (int i = 1; i <= totalLvls; i++) {
-      View diffLayout = layoutInflater.inflate(R.layout.difficulty_level, null);
-      diffLayout.setBackgroundResource(unselectedDificultyColor);
-      TextView tv = (TextView) diffLayout.findViewById(R.id.diff_tv);
-      tv.setText(String.valueOf(i));
-      if (i <= latestUnlocked) {
-        tv.setBackgroundResource(unlockedDifficultyColor);
-      } else {
-        tv.setBackgroundResource(lockedDifficultyColor);
-        tv.setEnabled(false);
-      }
-      tv.setOnClickListener(difficultyListener);
-      difficultyContainer.addView(diffLayout);
-    }
-  }
-
-  private View.OnClickListener difficultyListener = new OnClickListener() {
-
-    @Override
-    public void onClick(View v) {
-      for (int i = 0; i < difficultyContainer.getChildCount(); i++) {
-        View view = difficultyContainer.getChildAt(i);
-        view.setBackgroundResource(unselectedDificultyColor);
-      }
-      TextView tv = (TextView) v;
-      userSelectedDifficulty = Integer.parseInt(String.valueOf(tv.getText()));
-      FrameLayout fl = (FrameLayout) tv.getParent();
-      fl.setBackgroundResource(selectedDificultyColor);
-    }
-  };
-
-  public void handleResultFromOCR(int result) {
-    Character character = App.getInstance().getCharacterManager().getCharacter();
-    switch (result) {
-      case MissionContext.STAGE_PASSED:
-        Toast.makeText(context, context.getString(R.string.mission_stage_passed), Toast.LENGTH_SHORT).show();
-        break;
-
-      case MissionContext.STAGE_FAILED:
-        // do nothing
-        Toast.makeText(context, context.getString(R.string.mission_stage_failed), Toast.LENGTH_SHORT).show();
-        break;
-
-      case MissionContext.MISSION_COMPLETE:
-        Toast.makeText(context, context.getString(R.string.mission_finished), Toast.LENGTH_SHORT).show();
-
-        List<Achievement> unlockedAchievements = App.getInstance()
-            .getAchievementChecker()
-            .checkAchievements(character.getMission());
-
-        showUnlockedAchievements(unlockedAchievements);
-
-        // update unlocked level
-        character.unlockNewLevel();
-        // remove the mission
-        character.setMission(null);
-        break;
-    }
-    updatePanels();
-  }
-
-  private void showUnlockedAchievements(List<Achievement> unlockedAchievements) {
-    if (unlockedAchievements.size() == 0) {
-      return;
-    }
-    CharSequence[] achievements = new CharSequence[unlockedAchievements.size()];
-    int index = 0;
-    for (Achievement a : unlockedAchievements) {
-      achievements[index++] = a.getName();
-    }
-
-    String title = context.getString(R.string.title_unlocked_dialog);
-    String posBtnText = context.getString(R.string.goto_achievements);
-    String negBtnText = context.getString(R.string.cancel);
-
-    DialogInterface.OnClickListener positiveListener = new DialogInterface.OnClickListener() {
-
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        Intent intent = new Intent(context, AchievementsActivity.class);
-        context.startActivity(intent);
-      }
-    };
-
-    UiUtils.createDialogWithList(context, title, achievements, posBtnText, negBtnText, positiveListener,
-        UiUtils.getNegListener()).show();;
-  }
+	private StoryMission getStoryById(int id) {
+		Character currentCharacter = App.getInstance().getCharacterManager()
+				.getCharacter();
+		List<StoryMission> stories = storyGenerator.getStories().get(
+				currentCharacter.getName());
+		for (StoryMission story : stories) {
+			if (story.getId() == id) {
+				return story;
+			}
+		}
+		return null;
+	}
 
 }

@@ -11,29 +11,30 @@ import android.annotation.SuppressLint;
 import java.io.Serializable;
 import java.util.Random;
 
-public class MissionStage implements Serializable {
+import com.example.textrecoapp.models.StoryStep;
+
+public class MissionStage extends StoryStep implements Serializable {
 
   private static final long serialVersionUID = -176678885870997841L;
   
-  private Artifact artifact;
   private Random randomGenerator;
 
   public MissionStage(Artifact artifact) {
-    this.artifact = artifact;
+	super(artifact, artifact.getDescription());
     randomGenerator = new Random();
   }
 
   public boolean tryAnswer(String newTry) {
-    return artifact.getName().equals(newTry);
+    return getArtifact().getName().equals(newTry);
   }
 
   public String getHint() {
-    String[] sentences = artifact.getDescription().split("\\.");
+    String[] sentences = getArtifact().getDescription().split("\\.");
 
     int sentenceIndicator = 0;
     do {
       sentenceIndicator = randomGenerator.nextInt(sentences.length);
-    } while (isNotValidSentence(artifact.getName(), sentences[sentenceIndicator]));
+    } while (isNotValidSentence(getArtifact().getName(), sentences[sentenceIndicator]));
 
     return sentences[sentenceIndicator];
   }
@@ -41,10 +42,6 @@ public class MissionStage implements Serializable {
   @SuppressLint("DefaultLocale")
   private boolean isNotValidSentence(String answer, String sentence) {
     return sentence.toLowerCase().contains(answer);
-  }
-
-  public Artifact getArtifact() {
-    return artifact;
   }
 
 }
