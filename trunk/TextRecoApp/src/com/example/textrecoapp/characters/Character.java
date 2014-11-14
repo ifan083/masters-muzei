@@ -10,71 +10,82 @@ import java.io.Serializable;
 
 import com.example.textrecoapp.App;
 import com.example.textrecoapp.gameplay.MissionContext;
+import com.example.textrecoapp.models.StoryMission;
 
 /**
  * AKA Category.
  */
 public class Character implements Serializable {
 
-  private static final long serialVersionUID = 2100891000937263976L;
-  
-  public static final int KNOWLEDGE_BASIC = 1;
-  public static final int KNOWLEDGE_INTERMEDIATE = 2;
-  public static final int KNOWLEDGE_SUPERIOR = 3;
-  public static final int KNOWLEDGE_EXPERT = 4;
+	private static final long serialVersionUID = 2100891000937263976L;
 
-  private MissionContext mission;
-  private String name;
-  private String category;
-  private String pictureFilename;
-  private int latestUnlockedLevel;
-  private boolean state;
+	public static final int KNOWLEDGE_BASIC = 1;
+	public static final int KNOWLEDGE_INTERMEDIATE = 2;
+	public static final int KNOWLEDGE_SUPERIOR = 3;
+	public static final int KNOWLEDGE_EXPERT = 4;
 
-  public Character(String name, String category, String pictureFilename) {
+	private MissionContext mission;
+	private StoryMission story;
+	private String name;
+	private String category;
+	private String pictureFilename;
+	private int latestUnlockedLevel;
+	private boolean state;
 
-    this.name = name;
-    this.category = category;
-    this.pictureFilename = pictureFilename;
+	public Character(String name, String category, String pictureFilename) {
 
-    latestUnlockedLevel = 1;
-  }
+		this.name = name;
+		this.category = category;
+		this.pictureFilename = pictureFilename;
 
-  public String getName() {
-    return name;
-  }
+		latestUnlockedLevel = 1;
+	}
 
-  public String getCategory() {
-    return category;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public String getPictureFilename() {
-    return pictureFilename;
-  }
+	public String getCategory() {
+		return category;
+	}
 
-  public boolean getState() {
-    return state;
-  }
+	public String getPictureFilename() {
+		return pictureFilename;
+	}
 
-  public void changeState(boolean state) {
-    this.state = state;
-  }
+	public boolean getState() {
+		return state;
+	}
 
-  public int getLatestUnlockedLevel() {
-    return latestUnlockedLevel;
-  }
+	public void changeState(boolean state) {
+		this.state = state;
+	}
 
-  public MissionContext getMission() {
-    return mission;
-  }
+	public int getLatestUnlockedLevel() {
+		return latestUnlockedLevel;
+	}
 
-  public void setMission(MissionContext mission) {
-    this.mission = mission;
-  }
+	public MissionContext getMission() {
+		return mission;
+	}
 
-  public void unlockNewLevel() {
-    int total = App.getInstance().getCartographer().getTotalLevelsForCategory(category);
-    if (total > latestUnlockedLevel) {
-      latestUnlockedLevel++;
-    }
-  }
+	public void setMission(MissionContext mission) {
+		this.mission = mission;
+	}
+
+	public void unlockNewLevel() {
+		int total = App.getInstance().getCartographer()
+				.getTotalLevelsForCategory(category);
+		if (total > latestUnlockedLevel) {
+			latestUnlockedLevel++;
+		}
+	}
+
+	public StoryMission getStory() {
+		return story;
+	}
+
+	public void setStory(StoryMission story) {
+		this.story = story;
+	}
 }

@@ -139,7 +139,7 @@ public class OCRActivity extends Activity implements ScanningResult {
       }
     };
 
-    dialog = UiUtils.createDialogWithImageView(this, title, posBtnText, negBtnText, view, posListener, negListener);
+    dialog = UiUtils.createDialogWithView(this, title, posBtnText, negBtnText, view, posListener, negListener);
   }
 
   private Bitmap prepareBitmapFromCamera(byte[] data, int scanAreaWidth, int scanAreaHeight) {

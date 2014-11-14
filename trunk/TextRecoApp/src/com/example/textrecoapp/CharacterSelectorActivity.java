@@ -27,192 +27,199 @@ import com.example.textrecoapp.map.Cartographer;
 
 public class CharacterSelectorActivity extends Activity {
 
-  public static final int REQ_CODE_OCR = 3606;
-  public static final String EXTRAS_MISSION_STATUS = "mission_status";
-  public static final String EXTRAS_MISSION_ARTIFACT = "mission_artifact";
+	public static final int REQ_CODE_OCR = 3606;
+	public static final String EXTRAS_MISSION_STATUS = "mission_status";
+	public static final String EXTRAS_MISSION_ARTIFACT = "mission_artifact";
 
-  private ViewGroup leftPanel;
-  private ViewGroup rightPanel;
-  private ViewGroup mapPanel;
-  private ImageView cartographerImageView;
-  private View characterBackground;
-  private LinearLayout characterContainer;
+	private ViewGroup leftPanel;
+	private ViewGroup rightPanel;
+	private ViewGroup mapPanel;
+	private ImageView cartographerImageView;
+	private View characterBackground;
+	private LinearLayout characterContainer;
 
-  private int screenCenterX;
-  private View selectedView;
-  private int selectedViewLeft;
+	private int screenCenterX;
+	private View selectedView;
+	private int selectedViewLeft;
 
-  private int cartographerLeft;
+	private int cartographerLeft;
 
-  private CharacterMissionHandler missionHandler;
-  private CartographerMapHandler mapHandler;
+	private CharacterMissionHandler missionHandler;
+	private CartographerMapHandler mapHandler;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.panel_layout);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.panel_layout);
 
-    initUI();
-    loadCharacters();
-    loadHandlers();
-  }
+		initUI();
+		loadCharacters();
+		loadHandlers();
+	}
 
-  private void loadHandlers() {
-    missionHandler = new CharacterMissionHandler(this);
-    mapHandler = new CartographerMapHandler(this, mapPanel);
-  }
+	private void loadHandlers() {
+		missionHandler = new CharacterMissionHandler(this);
+		mapHandler = new CartographerMapHandler(this, mapPanel);
+	}
 
-  private void initUI() {
-    // views
-    characterBackground = findViewById(R.id.character_background);
-    characterBackground.setBackgroundResource(R.drawable.character_background);
-    characterContainer = (LinearLayout) findViewById(R.id.character_container);
+	private void initUI() {
+		// views
+		characterBackground = findViewById(R.id.character_background);
+		characterBackground
+				.setBackgroundResource(R.drawable.character_background);
+		characterContainer = (LinearLayout) findViewById(R.id.character_container);
 
-    leftPanel = (ViewGroup) findViewById(R.id.left_info_panel);
-    rightPanel = (ViewGroup) findViewById(R.id.right_info_panel);
-    mapPanel = (ViewGroup) findViewById(R.id.map_panel);
+		leftPanel = (ViewGroup) findViewById(R.id.left_info_panel);
+		rightPanel = (ViewGroup) findViewById(R.id.right_info_panel);
+		mapPanel = (ViewGroup) findViewById(R.id.map_panel);
 
-    // values
-    DisplayMetrics metrics = getResources().getDisplayMetrics();
-    screenCenterX = metrics.widthPixels / 2;
+		// values
+		DisplayMetrics metrics = getResources().getDisplayMetrics();
+		screenCenterX = metrics.widthPixels / 2;
 
-    cartographerLeft = getResources().getDimensionPixelOffset(R.dimen.cartographer_left);
-  }
+		cartographerLeft = getResources().getDimensionPixelOffset(
+				R.dimen.cartographer_left);
+	}
 
-  private View.OnClickListener characterClickListener = new OnClickListener() {
+	private View.OnClickListener characterClickListener = new OnClickListener() {
 
-    @Override
-    public void onClick(View v) {
+		@Override
+		public void onClick(View v) {
 
-      // stop further selecting of the same character
-      if (selectedView != null) {
-        return;
-      }
+			// stop further selecting of the same character
+			if (selectedView != null) {
+				return;
+			}
 
-      // fade out other views
-      for (int i = 0; i < characterContainer.getChildCount(); i++) {
-        final View childView = characterContainer.getChildAt(i);
-        if (!v.equals(childView)) {
-          AnimationUtils.fadeOutView(childView);
-        }
-      }
+			// fade out other views
+			for (int i = 0; i < characterContainer.getChildCount(); i++) {
+				final View childView = characterContainer.getChildAt(i);
+				if (!v.equals(childView)) {
+					AnimationUtils.fadeOutView(childView);
+				}
+			}
 
-      selectedView = v;
-      int left = v.getLeft() + v.getWidth() / 2;
-      selectedViewLeft = left;
+			selectedView = v;
+			int left = v.getLeft() + v.getWidth() / 2;
+			selectedViewLeft = left;
 
-      if (v.getTag().equals(Cartographer.CARTOGRAPHER)) {
+			if (v.getTag().equals(Cartographer.CARTOGRAPHER)) {
 
-        v.animate().translationX(cartographerLeft - left);
-        AnimationUtils.fadeInView(mapPanel);
+				v.animate().translationX(cartographerLeft - left);
+				AnimationUtils.fadeInView(mapPanel);
 
-        mapHandler.handleMapBrowsing();
-      } else {
+				mapHandler.handleMapBrowsing();
+			} else {
 
-        v.animate().translationXBy(screenCenterX - left);
+				v.animate().translationXBy(screenCenterX - left);
 
-        AnimationUtils.fadeInView(leftPanel);
-        AnimationUtils.fadeInView(rightPanel);
+				AnimationUtils.fadeInView(leftPanel);
+				AnimationUtils.fadeInView(rightPanel);
 
-        String characterName = String.valueOf(v.getTag());
-        missionHandler.handleMissionForCharacter(characterName, leftPanel, rightPanel);
-      }
-    }
+				String characterName = String.valueOf(v.getTag());
+				missionHandler.handleMissionForCharacter(characterName,
+						leftPanel, rightPanel);
+			}
+		}
 
-  };
+	};
 
-  private void loadCharacters() {
-    LinearLayout.LayoutParams params =
-        new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+	private void loadCharacters() {
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-    cartographerImageView = new ImageView(this);
-    cartographerImageView.setLayoutParams(params);
-    cartographerImageView.setTag(Cartographer.CARTOGRAPHER);
-    cartographerImageView.setImageDrawable(UiUtils.getStateDrawableForId(this, Cartographer.CARTOGRAPHER, false));
-    cartographerImageView.setOnClickListener(characterClickListener);
-    characterContainer.addView(cartographerImageView);
+		cartographerImageView = new ImageView(this);
+		cartographerImageView.setLayoutParams(params);
+		cartographerImageView.setTag(Cartographer.CARTOGRAPHER);
+		cartographerImageView.setImageDrawable(UiUtils.getStateDrawableForId(
+				this, Cartographer.CARTOGRAPHER, false));
+		cartographerImageView.setOnClickListener(characterClickListener);
+		characterContainer.addView(cartographerImageView);
 
-    CharacterGenerator characterGenerator = new CharacterGenerator();
-    
-    for (Character character : characterGenerator.getCharacters()) {
-      ImageView iv = new ImageView(this);
-      iv.setLayoutParams(params);
-      iv.setTag(character.getName());
-      iv.setImageDrawable(UiUtils.getStateDrawableForId(this, character.getPictureFilename(), false));
-      iv.setOnClickListener(characterClickListener);
-      characterContainer.addView(iv);
-    }
-  }
+		CharacterGenerator characterGenerator = new CharacterGenerator();
 
-  private void goBackToNormal() {
-    for (int i = 0; i < characterContainer.getChildCount(); i++) {
-      final View childView = characterContainer.getChildAt(i);
-      if (!childView.equals(selectedView)) {
-        AnimationUtils.fadeInView(childView);
-      }
-    }
+		for (Character character : characterGenerator.getCharacters()) {
+			ImageView iv = new ImageView(this);
+			iv.setLayoutParams(params);
+			iv.setTag(character.getName());
+			iv.setImageDrawable(UiUtils.getStateDrawableForId(this,
+					character.getPictureFilename(), false));
+			iv.setOnClickListener(characterClickListener);
+			characterContainer.addView(iv);
+		}
+	}
 
-    if (selectedView.getTag().equals(Cartographer.CARTOGRAPHER)) {
-      selectedView.animate().translationXBy(selectedViewLeft - cartographerLeft);
+	private void goBackToNormal() {
+		for (int i = 0; i < characterContainer.getChildCount(); i++) {
+			final View childView = characterContainer.getChildAt(i);
+			if (!childView.equals(selectedView)) {
+				AnimationUtils.fadeInView(childView);
+			}
+		}
 
-      AnimationUtils.fadeOutView(mapPanel);
-    } else {
-      selectedView.animate().translationXBy(selectedViewLeft - screenCenterX);
+		if (selectedView.getTag().equals(Cartographer.CARTOGRAPHER)) {
+			selectedView.animate().translationXBy(
+					selectedViewLeft - cartographerLeft);
 
-      AnimationUtils.fadeOutView(leftPanel);
-      AnimationUtils.fadeOutView(rightPanel);
-    }
+			AnimationUtils.fadeOutView(mapPanel);
+		} else {
+			selectedView.animate().translationXBy(
+					selectedViewLeft - screenCenterX);
 
-    selectedView = null;
-  }
+			AnimationUtils.fadeOutView(leftPanel);
+			AnimationUtils.fadeOutView(rightPanel);
+		}
 
-  @Override
-  public void onBackPressed() {
-    if (selectedView == null) {
-      super.onBackPressed();
-    } else {
-      goBackToNormal();
-    }
-  }
+		selectedView = null;
+	}
 
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
+	@Override
+	public void onBackPressed() {
+		if (selectedView == null) {
+			super.onBackPressed();
+		} else {
+			goBackToNormal();
+		}
+	}
 
-    if (requestCode == REQ_CODE_OCR && resultCode == RESULT_OK) {
-      int result = data.getExtras().getInt(EXTRAS_MISSION_STATUS);
-      Artifact artifact = (Artifact) data.getExtras().get(EXTRAS_MISSION_ARTIFACT);
-      resolveScanResult(result, artifact);
-    }
-  }
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
 
-  private void resolveScanResult(int result, Artifact artifact) {
-    switch (result) {
-      case MissionContext.STAGE_FAILED:
-        if (artifact != null) {
-          goBackToNormal();
+		if (requestCode == REQ_CODE_OCR && resultCode == RESULT_OK) {
+			int result = data.getExtras().getInt(EXTRAS_MISSION_STATUS);
+			Artifact artifact = (Artifact) data.getExtras().get(
+					EXTRAS_MISSION_ARTIFACT);
+			resolveScanResult(result, artifact);
+		}
+	}
 
-          cartographerImageView.performClick();
+	private void resolveScanResult(int result, Artifact artifact) {
+		switch (result) {
+		case MissionContext.STAGE_FAILED:
+			if (artifact != null) {
+				goBackToNormal();
 
-          mapHandler.handleWrongExistingArtifactScanned(artifact);
-        } else {
-          missionHandler.handleResultFromOCR(result);
-        }
-        break;
+				cartographerImageView.performClick();
 
-      case MissionContext.STAGE_PASSED:
-      case MissionContext.MISSION_COMPLETE:
-        if (!artifact.isArtefactUnlocked()) {
-          goBackToNormal();
-          cartographerImageView.performClick();
-          App.getInstance().getCartographer().unlockArtifact(artifact);
-          mapHandler.handleUnlockingArtifact(artifact);
-        }
-        missionHandler.handleResultFromOCR(result);
+				mapHandler.handleWrongExistingArtifactScanned(artifact);
+			} else {
+				missionHandler.handleResultFromOCR(result);
+			}
+			break;
 
-      default:
-        break;
-    }
-  }
+		case MissionContext.STAGE_PASSED:
+		case MissionContext.MISSION_COMPLETE:
+			if (!artifact.isArtefactUnlocked()) {
+				goBackToNormal();
+				cartographerImageView.performClick();
+				App.getInstance().getCartographer().unlockArtifact(artifact);
+				mapHandler.handleUnlockingArtifact(artifact);
+			}
+			missionHandler.handleResultFromOCR(result);
 
+		default:
+			break;
+		}
+	}
 }

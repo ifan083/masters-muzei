@@ -2,5 +2,9 @@
 
     <color name="progress_background">#A8CCCCCC</color>
     <color name="panel_background">#A8202020</color>
+    <color name="progress_rest">#A8666666</color>
+    <color name="progress_current">#A8FF0000</color>
+    
+    <color name="expand_group_background">#a8f9f9f9</color>
 
 </resources>

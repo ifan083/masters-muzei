@@ -46,6 +46,11 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
+        <activity
+            android:name="com.example.textrecoapp.story.StoryModeActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
     </application>
 
 </manifest>

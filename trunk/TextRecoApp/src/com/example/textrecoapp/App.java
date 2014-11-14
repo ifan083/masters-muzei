@@ -28,88 +28,93 @@ import com.googlecode.tesseract.android.TessBaseAPI;
 
 public class App extends Application {
 
-  private static App instance;
-  private TessBaseAPI ocrAPI;
-  private CharacterManager characterManager;
-  private Cartographer cartographer;
-  private GSONPersister persister;
-  private AchievementChecker achievementChecker;
-  private Map<String, List<Achievement>> achievements;
+	private static App instance;
+	private TessBaseAPI ocrAPI;
+	private CharacterManager characterManager;
+	private Cartographer cartographer;
+	private GSONPersister persister;
+	private AchievementChecker achievementChecker;
+	private Map<String, List<Achievement>> achievements;
 
-  public static final String LANG = "mkd";
+	public static final String LANG = "mkd";
 
-  public static App getInstance() {
-    return instance;
-  }
+	public static App getInstance() {
+		return instance;
+	}
 
-  public App() {
-    instance = this;
-    TrainSetHandler tsh = new TrainSetHandler(this, LANG);
-    tsh.initDirectory();
+	public App() {
+		instance = this;
+	}
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		TrainSetHandler tsh = new TrainSetHandler(getApplicationContext(), LANG);
+		tsh.initDirectory();
 
-    new Runnable() {
+		new Runnable() {
 
-      @Override
-      public void run() {
-        ocrAPI = new TessBaseAPI();
-        ocrAPI.init(TrainSetHandler.DATA_PATH, LANG);
-      }
-    }.run();;
+			@Override
+			public void run() {
+				ocrAPI = new TessBaseAPI();
+				ocrAPI.init(TrainSetHandler.DATA_PATH, LANG);
+			}
+		}.run();
 
-    persister = new GSONPersister();
+		persister = new GSONPersister();
 
-    initApp();
-  }
+		initApp();
+	}
 
-  private void initApp() {
-    // characters
-    List<Character> characters = persister.getStoredCharacters();
-    if (characters == null) {
-      CharacterGenerator characterGenerator = new CharacterGenerator();
-      characters = characterGenerator.getCharacters();
-    }
-    characterManager = new CharacterManager(characters);
+	private void initApp() {
+		// characters
+		List<Character> characters = persister.getStoredCharacters();
+		if (characters == null) {
+			CharacterGenerator characterGenerator = new CharacterGenerator();
+			characters = characterGenerator.getCharacters();
+		}
+		characterManager = new CharacterManager(characters);
 
-    // artifacts
-    List<Floor> floors = FloorGenerator.getInstance().getFloors();
-    List<Artifact> artifacts = persister.getStoredArtifacts();
-    if (artifacts == null) {
-      ArtifactsGenerator artifactsGenerator = new ArtifactsGenerator();
-      artifacts = artifactsGenerator.getArtifacts();
-    }
-    cartographer = new Cartographer(floors, artifacts);
+		// artifacts
+		List<Floor> floors = FloorGenerator.getInstance().getFloors();
+		List<Artifact> artifacts = persister.getStoredArtifacts();
+		if (artifacts == null) {
+			ArtifactsGenerator artifactsGenerator = new ArtifactsGenerator();
+			artifacts = artifactsGenerator.getArtifacts();
+		}
+		cartographer = new Cartographer(floors, artifacts);
 
-    achievements = persister.getStoredAchievements();
-    if (achievements == null) {
-      AchievementGenerator achievementGenerator = new AchievementGenerator();
-      achievements = achievementGenerator.getAchievements();
-    }
-    
-    achievementChecker = new AchievementChecker();
-  }
+		achievements = persister.getStoredAchievements();
+		if (achievements == null) {
+			AchievementGenerator achievementGenerator = new AchievementGenerator();
+			achievements = achievementGenerator.getAchievements();
+		}
 
-  public TessBaseAPI getOCR_API() {
-    return ocrAPI;
-  }
+		achievementChecker = new AchievementChecker();
+	}
 
-  public CharacterManager getCharacterManager() {
-    return characterManager;
-  }
+	public TessBaseAPI getOCR_API() {
+		return ocrAPI;
+	}
 
-  public Cartographer getCartographer() {
-    return cartographer;
-  }
+	public CharacterManager getCharacterManager() {
+		return characterManager;
+	}
 
-  public GSONPersister getPersister() {
-    return persister;
-  }
+	public Cartographer getCartographer() {
+		return cartographer;
+	}
 
-  public AchievementChecker getAchievementChecker() {
-    return achievementChecker;
-  }
+	public GSONPersister getPersister() {
+		return persister;
+	}
 
-  public Map<String, List<Achievement>> getAchievements() {
-    return achievements;
-  }
+	public AchievementChecker getAchievementChecker() {
+		return achievementChecker;
+	}
+
+	public Map<String, List<Achievement>> getAchievements() {
+		return achievements;
+	}
 
 }
